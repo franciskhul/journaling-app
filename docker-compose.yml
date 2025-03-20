@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16.8
+    container_name: journaling-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: journaling_app
+    ports:
+      - "5440:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - journaling-network
+
+networks:
+  journaling-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
