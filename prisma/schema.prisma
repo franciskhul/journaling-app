@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  email     String   @unique
+  email     String    @unique
   password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Journal   Journal[]
 
   @@index([email])
   @@index([id])
@@ -29,4 +30,18 @@ model User {
 enum Role {
   ADMIN
   USER
+}
+
+model Journal {
+  id        String   @id @default(uuid())
+  user_id   Int
+  title     String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([title])
+  @@index([createdAt])
 }
