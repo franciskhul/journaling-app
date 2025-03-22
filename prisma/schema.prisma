@@ -14,7 +14,7 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(uuid()) @db.Uuid
   name      String
   email     String    @unique
   password  String
@@ -33,8 +33,8 @@ enum Role {
 }
 
 model Journal {
-  id        String   @id @default(uuid())
-  user_id   Int
+  id        String   @id @default(uuid()) @db.Uuid
+  user_id   String   @db.Uuid
   title     String
   content   String   @db.Text
   createdAt DateTime @default(now())
