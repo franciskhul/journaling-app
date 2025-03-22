@@ -10,6 +10,7 @@
    5. [Start PostgreSQL with Docker](#start-postgresql-with-docker)
    6. [Initialize Prisma](#initialize-prisma)
    7. [Run the Development Server](#run-the-development-server)
+2. [View API Documentation](#view-api-documentation)
 
 ---
 
@@ -170,3 +171,10 @@ npm run dev
 ```
 
 The app will be available at [http://localhost:3000](http://localhost:3000).
+
+## View API Documentation
+
+The API documentation is automatically generated using Swagger. To view the API documentation:
+
+- Swagger UI: Visit [Swagger API UI](http://localhost:3000/api-docs) to view the API documentation in JSON format.
+- Swagger JSON: Visit [Swagger API JSON](http://localhost:3000/api-docs/json) to view the API documentation in JSON format.
