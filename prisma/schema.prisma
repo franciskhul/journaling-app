@@ -14,15 +14,16 @@ datasource db {
 }
 
 model User {
-  id         String     @id @default(uuid()) @db.Uuid
-  name       String
-  email      String     @unique
-  password   String
-  role       Role       @default(USER)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  Journal    Journal[]
-  categories Category[]
+  id           String         @id @default(uuid()) @db.Uuid
+  name         String
+  email        String         @unique
+  password     String
+  role         Role           @default(USER)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Journal      Journal[]
+  categories   Category[]     @relation("UserCategories")
+  UserCategory UserCategory[]
 
   @@index([email])
   @@index([id])
@@ -59,8 +60,8 @@ model Category {
   updatedAt       DateTime          @updatedAt
   journals        Journal[]         @relation("JournalCategories")
   JournalCategory JournalCategory[]
-  User            User?             @relation(fields: [userId], references: [id])
-  userId          String?           @db.Uuid
+  users           User[]            @relation("UserCategories")
+  UserCategory    UserCategory[]
 
   @@index([createdAt])
 }
@@ -73,4 +74,14 @@ model JournalCategory {
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([journalId, categoryId]) // Composite primary key
+}
+
+model UserCategory {
+  userId     String @db.Uuid
+  categoryId String @db.Uuid
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([userId, categoryId]) // Composite primary key
 }
