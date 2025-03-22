@@ -1,12 +1,10 @@
-import SwaggerUI from "swagger-ui-react";
+"use client";
+
 import "swagger-ui-react/swagger-ui.css";
+import SwaggerUI from "swagger-ui-react";
 
 export default function ApiDocsPage() {
   const swaggerUrl = "/api-docs/json";
 
-  return (
-    <div>
-      <SwaggerUI url={swaggerUrl} />
-    </div>
-  );
+  return <SwaggerUI url={swaggerUrl} />;
 }
