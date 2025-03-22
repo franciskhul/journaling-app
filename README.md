@@ -162,6 +162,14 @@ After setting up the database, generate the Prisma client by running:
 npx prisma generate
 ```
 
+### Seed the database
+
+Run the following command to seed the database
+
+```bash
+npx prisma db seed
+```
+
 ### Run the Development Server
 
 Once everything is set up, you can run the development server:
@@ -170,7 +178,17 @@ Once everything is set up, you can run the development server:
 npm run dev
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).
+After running the command, a link will be logged in the terminal. Use the link provided to open application in your browser.
+
+### Start prisma studio (Optional)
+
+Run the following command to start studio prisma.
+
+```bash
+npx prisma studio
+```
+
+After running the command, a link will be logged in the terminal. Use the link provided to open Prisma Studio in your browser.
 
 ## View API Documentation
 
