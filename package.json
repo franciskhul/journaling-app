@@ -13,8 +13,10 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "cypress:open": "cypress open",
-    "seed": "ts-node prisma/seed.ts"
+    "cypress:open": "cypress open"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
@@ -31,7 +33,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
-    "@types/node": "^20",
+    "@types/node": "^20.17.25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "cypress": "^14.2.0",
@@ -42,6 +44,6 @@
     "next-swagger-doc": "^0.4.1",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5.8.2"
   }
 }
