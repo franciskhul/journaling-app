@@ -44,11 +44,13 @@ nvm install
 nvm use
 ```
 
-Then, install the project dependencies using npm:
+Then install the project dependencies using npm. If you encounter peer dependency issues, use the `--legacy-peer-deps` flag to install dependencies:
 
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
+
+The `--legacy-peer-deps` flag may be necessary due to peer dependency conflicts. It ensures all dependencies are installed correctly without strict peer dependency checks.
 
 ### Set Up Environment Variables
 
