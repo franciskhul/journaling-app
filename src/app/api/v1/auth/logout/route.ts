@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revokeRefreshToken, addToJWTDenylist } from "@/lib/auth-db";
 import { verifyToken } from "@/lib/jwt";
+import { getCookieValue } from "@/lib/cookies";
 
 /**
  * @swagger
@@ -32,7 +33,10 @@ import { verifyToken } from "@/lib/jwt";
  *         description: Invalid or expired access token.
  */
 export async function DELETE(req: Request) {
-  const { refreshToken, accessToken } = await req.json();
+  const cookieAccessToken = getCookieValue(req, "accessToken");
+  const { refreshToken, accessToken: bodyAccessToken } = await req.json();
+
+  const accessToken = cookieAccessToken || bodyAccessToken;
 
   if (!accessToken || !refreshToken) {
     return NextResponse.json(
