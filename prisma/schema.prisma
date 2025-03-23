@@ -24,6 +24,7 @@ model User {
   Journal      Journal[]
   categories   Category[]     @relation("UserCategories")
   UserCategory UserCategory[]
+  tokens       RefreshToken[]
 
   @@index([email])
   @@index([id])
@@ -32,6 +33,18 @@ model User {
 enum Role {
   ADMIN
   USER
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
 }
 
 model Journal {
