@@ -27,7 +27,7 @@ model User {
   tokens       RefreshToken[]
 
   @@index([email])
-  @@index([id])
+  @@index([role])
 }
 
 enum Role {
