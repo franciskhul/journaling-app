@@ -23,3 +23,13 @@ export async function validateRefreshToken(token: string) {
 export async function revokeRefreshToken(token: string) {
   await db.refreshToken.deleteMany({ where: { token } });
 }
+
+export async function addToJWTDenylist(token: string, userId: string) {
+  await db.jWT_Denylist.create({
+    data: {
+      token,
+      userId: userId,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Set expiration (same as access token)
+    },
+  });
+}
