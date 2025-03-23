@@ -170,6 +170,12 @@ Run the following command to seed the database
 npx prisma db seed
 ```
 
+### Run the following command to generate ACCESS_TOKEN_SECRET and REFRESH_TOKEN_SECRET in the .env file
+
+```bash
+npm run generate-secrets
+```
+
 ### Run the Development Server
 
 Once everything is set up, you can run the development server:
