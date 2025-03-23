@@ -40,6 +40,8 @@ model RefreshToken {
   userId    String   @db.Uuid
   user      User     @relation(fields: [userId], references: [id])
   token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   expiresAt DateTime
 
   @@index([userId])
