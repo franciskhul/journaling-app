@@ -5,7 +5,7 @@ import { getCookieValue } from "@/lib/cookies";
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /api/v1/auth/logout:
  *   delete:
  *     summary: Logout the user
  *     description: Logs out the user by revoking the refresh token and adding the access token to a denylist.
