@@ -23,6 +23,47 @@ declare module "next-auth" {
   }
 }
 
+/**
+ * @swagger
+ * /api/v1/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticates a user with credentials and returns access and refresh tokens in the response body.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 example: "password123"
+ *     responses:
+ *       200:
+ *         description: Successfully authenticated.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: The generated access token.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *                 refreshToken:
+ *                   type: string
+ *                   description: The refresh token.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *       401:
+ *         description: Invalid credentials.
+ */
+
 export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
@@ -38,12 +79,6 @@ export const authOptions: AuthOptions = {
         token.refreshToken = await saveRefreshToken(user.id);
       }
       return token;
-    },
-
-    async session({ session, token }) {
-      session.accessToken = token.accessToken as string;
-      session.refreshToken = token.refreshToken as string;
-      return session;
     },
   },
   providers: [
@@ -76,5 +111,9 @@ export const authOptions: AuthOptions = {
   ],
 };
 
+/**
+ * @swagger
+ * (Swagger documentation goes here)
+ */
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
