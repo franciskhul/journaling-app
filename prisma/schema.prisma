@@ -25,6 +25,7 @@ model User {
   categories   Category[]     @relation("UserCategories")
   UserCategory UserCategory[]
   tokens       RefreshToken[]
+  JWT_Denylist JWT_Denylist[]
 
   @@index([email])
   @@index([role])
@@ -48,6 +49,17 @@ model RefreshToken {
   @@index([token])
   @@index([expiresAt])
   @@index([createdAt])
+}
+
+model JWT_Denylist {
+  id        String   @id @default(uuid()) @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([token])
 }
 
 model Journal {
