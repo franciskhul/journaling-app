@@ -1,16 +1,46 @@
 "use client";
-// import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [pending, setPending] = useState(false);
+  const { status } = useSession();
+  const router = useRouter();
+
+  console.log("******status**********", status);
+  console.log("******pending**********", pending);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("*******password", password);
-    console.log("*******email", email);
+    setPending(true);
+    // console.log("*******password", password);
+    // console.log("*******email", email);
+    // const result = await signIn("credentials", {
+    //   redirect: false,
+    //   email,
+    //   password,
+    // });
+    // console.log("*******result", result);
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+      if (res?.error) {
+        console.log("res error :::: ", res);
+      } else {
+        router.push("/");
+      }
+    } catch (e) {
+      console.log("*******error", e);
+    }
+    setPending(false);
   };
 
   return (
@@ -92,12 +122,12 @@ export default function LoginPage() {
 
         <p className="mt-10 text-center text-sm/6 text-gray-500">
           Not a member?{" "}
-          <a
-            href="#"
+          <Link
+            href="/auth/register"
             className="font-semibold text-indigo-600 hover:text-indigo-500"
           >
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </div>
