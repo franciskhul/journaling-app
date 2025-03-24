@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",
+    "@radix-ui/react-slot": "^1.1.2",
     "@tailwindcss/postcss": "^4.0.15",
     "@types/swagger-ui-react": "^5.18.0",
     "bcrypt": "^5.1.1",
