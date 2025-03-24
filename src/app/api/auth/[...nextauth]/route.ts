@@ -149,10 +149,9 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  // pages: {
-  //   signIn: "/auth/signin",
-  //   error: "/auth/error", // Redirect to a custom error page
-  // },
+  pages: {
+    signIn: "/auth/login",
+  },
 };
 
 /**
