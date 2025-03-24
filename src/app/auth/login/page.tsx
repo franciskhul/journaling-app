@@ -1,46 +1,67 @@
 "use client";
-import { signIn, useSession } from "next-auth/react";
+import { signIn /*useSession*/ } from "next-auth/react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+// Define validation schema
+const formSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
-  const { status } = useSession();
+  // const { status } = useSession();
   const router = useRouter();
 
-  console.log("******status**********", status);
-  console.log("******pending**********", pending);
+  // Initialize form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setPending(true);
-    // console.log("*******password", password);
-    // console.log("*******email", email);
-    // const result = await signIn("credentials", {
-    //   redirect: false,
-    //   email,
-    //   password,
-    // });
-    // console.log("*******result", result);
     try {
       const res = await signIn("credentials", {
         redirect: false,
-        email,
-        password,
+        email: values.email,
+        password: values.password,
       });
+
       if (res?.error) {
-        console.log("res error :::: ", res);
+        form.setError("root", {
+          type: "manual",
+          message: res.error,
+        });
       } else {
         router.push("/");
       }
     } catch (e) {
-      console.log("*******error", e);
+      console.error("*******catch error error", e);
+      form.setError("root", {
+        type: "manual",
+        message: "An error occurred during login",
+      });
     }
     setPending(false);
   };
@@ -55,64 +76,73 @@ export default function LoginPage() {
           width={40}
           height={40}
         />
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           Sign in to your account
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-900"
-            >
-              Email address
-            </label>
-            <div className="mt-2">
-              <input
-                type="email"
-                name="email"
-                id="email"
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              />
-            </div>
-          </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {form.formState.errors.root && (
+              <p className="text-sm font-medium text-destructive">
+                {form.formState.errors.root.message}
+              </p>
+            )}
 
-          <div>
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="password"
-                className="block text-sm/6 font-medium text-gray-900"
-              >
-                Password
-              </label>
-              <div className="text-sm">
-                <a
-                  href="#"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500"
-                >
-                  Forgot password?
-                </a>
-              </div>
-            </div>
-            <div className="mt-2">
-              <input
-                type="password"
-                name="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              />
-            </div>
-          </div>
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <FormLabel
+                    className={fieldState.error ? "text-destructive" : ""}
+                  >
+                    Email address
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="email@example.com"
+                      type="email"
+                      autoComplete="email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <div>
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field, fieldState }) => (
+                <FormItem>
+                  <div className="flex items-center justify-between">
+                    <FormLabel
+                      className={fieldState.error ? "text-destructive" : ""}
+                    >
+                      Password
+                    </FormLabel>
+                    <Link
+                      href="#"
+                      className="text-sm font-semibold text-indigo-600 hover:text-indigo-500"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      autoComplete="current-password"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <Button
               type="submit"
               disabled={pending}
@@ -127,10 +157,10 @@ export default function LoginPage() {
                 "Sign in"
               )}
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
 
-        <p className="mt-10 text-center text-sm/6 text-gray-500">
+        <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?{" "}
           <Link
             href="/auth/register"
