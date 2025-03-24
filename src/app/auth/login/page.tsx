@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import * as z from "zod";
 import {
   Form,
@@ -54,6 +55,7 @@ export default function LoginPage() {
           message: res.error,
         });
       } else {
+        toast("Login successful. Welcome back!");
         router.push("/");
       }
     } catch (e) {
