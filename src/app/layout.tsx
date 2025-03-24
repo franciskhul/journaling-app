@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/sonner";
 // import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NextAuthSessionProvider from "./providers/SessionProvider";
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <NextAuthSessionProvider>{children}</NextAuthSessionProvider>
+        <Toaster />
       </body>
     </html>
   );
