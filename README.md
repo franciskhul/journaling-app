@@ -76,7 +76,7 @@ You can set up PostgreSQL in two ways: using **Docker Compose** or installing it
 If you prefer to use Docker to manage PostgreSQL, you can spin up the database with Docker Compose:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start PostgreSQL in a container and make it available on port 5440 (as defined in docker-compose.yml).
