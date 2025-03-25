@@ -146,6 +146,21 @@ describe("LoginPage", () => {
 
     expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
   });
+
+  it("displays error messages when submitting without email or password", async () => {
+    render(<LoginPage />);
+
+    const loginButton = screen.getByRole("button", { name: /login/i });
+    fireEvent.click(loginButton);
+
+    const emailError = await screen.findByText(
+      /please enter a valid email address/i
+    );
+    expect(emailError).toBeInTheDocument();
+
+    const passwordError = await screen.findByText(/password is required/i);
+    expect(passwordError).toBeInTheDocument();
+  });
 });
 
 // // type MockSignInResponse =
