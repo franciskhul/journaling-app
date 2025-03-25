@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, Inbox, Settings, Plus, BookHeart } from "lucide-react";
+import { Lightbulb, Newspaper, Settings, Plus, BookHeart } from "lucide-react";
 // import { usePathname } from "next/navigation";
 
 import {
@@ -20,12 +20,12 @@ const items = [
   {
     title: "My Entries",
     url: "/my-journal/entries",
-    icon: Inbox,
+    icon: Newspaper,
   },
   {
     title: "Insights",
     url: "/my-journal/insights",
-    icon: Calendar,
+    icon: Lightbulb,
   },
   {
     title: "Settings",
