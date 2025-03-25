@@ -79,6 +79,47 @@ describe("LoginPage", () => {
 
     expect(mockPush).toHaveBeenCalledWith("/");
   });
+
+  it("displays loading state when form is submitted", async () => {
+    (signIn as jest.Mock).mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ error: null }), 1000)
+        )
+    );
+
+    render(<LoginPage />);
+
+    // Simulate user entering email and password
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "test@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: "password123" },
+    });
+
+    // Simulate form submission
+    const loginButton = screen.getByRole("button", { name: /login/i });
+
+    fireEvent.click(loginButton);
+
+    // Check if loading state (spinner) is displayed
+    const loadingButton = await screen.findByRole("button", {
+      name: /logging in.../i,
+    });
+
+    expect(loadingButton).toBeInTheDocument();
+
+    // Wait for async actions
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      const buttonAfterSubmit = screen.getByRole("button", { name: /login/i });
+      expect(buttonAfterSubmit).toBeInTheDocument();
+    });
+  });
 });
 
 // // type MockSignInResponse =
