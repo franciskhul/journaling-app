@@ -35,9 +35,13 @@ describe("LoginPage", () => {
       screen.getByRole("heading", { name: /login to your account/i })
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/email/i, { selector: "input" })
+    ).toBeInTheDocument();
 
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(/password/i, { selector: "input" })
+    ).toBeInTheDocument();
 
     expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
 
@@ -57,13 +61,16 @@ describe("LoginPage", () => {
 
     render(<LoginPage />);
 
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
       target: { value: "test@example.com" },
     });
 
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: "password123" },
-    });
+    fireEvent.change(
+      screen.getByLabelText(/password/i, { selector: "input" }),
+      {
+        target: { value: "password123" },
+      }
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
@@ -91,12 +98,15 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     // Simulate user entering email and password
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
       target: { value: "test@example.com" },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: "password123" },
-    });
+    fireEvent.change(
+      screen.getByLabelText(/password/i, { selector: "input" }),
+      {
+        target: { value: "password123" },
+      }
+    );
 
     // Simulate form submission
     const loginButton = screen.getByRole("button", { name: /login/i });
@@ -126,13 +136,16 @@ describe("LoginPage", () => {
 
     render(<LoginPage />);
 
-    fireEvent.change(screen.getByLabelText(/email/i), {
+    fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
       target: { value: "wrong@example.com" },
     });
 
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: "wrongpassword" },
-    });
+    fireEvent.change(
+      screen.getByLabelText(/password/i, { selector: "input" }),
+      {
+        target: { value: "wrongpassword" },
+      }
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /login/i }));
 
@@ -166,5 +179,32 @@ describe("LoginPage", () => {
     render(<LoginPage />);
     const signUpLink = screen.getByRole("link", { name: /sign up/i });
     expect(signUpLink).toHaveAttribute("href", "/auth/registration");
+  });
+
+  it("toggles password visibility when clicking the eye icon", async () => {
+    render(<LoginPage />);
+
+    const passwordInput = screen.getByLabelText(/password/i, {
+      selector: "input",
+    }) as HTMLInputElement;
+
+    let eyeButton = screen.getByRole("button", { name: /show password/i });
+    expect(passwordInput.type).toBe("password");
+    expect(screen.getByTestId("eye-icon")).toBeInTheDocument();
+    expect(screen.queryByTestId("eye-off-icon")).not.toBeInTheDocument();
+
+    fireEvent.click(eyeButton);
+    expect(passwordInput.type).toBe("text");
+    expect(screen.getByTestId("eye-off-icon")).toBeInTheDocument();
+    expect(screen.queryByTestId("eye-icon")).not.toBeInTheDocument();
+
+    eyeButton = screen.getByRole("button", { name: /hide password/i });
+
+    fireEvent.click(eyeButton);
+
+    expect(passwordInput.type).toBe("password");
+
+    expect(screen.getByTestId("eye-icon")).toBeInTheDocument();
+    expect(screen.queryByTestId("eye-off-icon")).not.toBeInTheDocument();
   });
 });
