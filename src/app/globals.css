@@ -140,3 +140,11 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
+@keyframes subtleMove {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 10px 10px; }
+}
+
+.sidebar-texture {
+  animation: subtleMove 20s infinite ease-in-out;
+}
