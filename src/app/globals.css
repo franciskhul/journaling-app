@@ -148,3 +148,17 @@
 .sidebar-texture {
   animation: subtleMove 20s infinite ease-in-out;
 }
+
+.calendar-transition {
+  transition: all 0.2s ease;
+  transform-origin: top center;
+}
+
+.calendar-transition[data-state="open"] {
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
