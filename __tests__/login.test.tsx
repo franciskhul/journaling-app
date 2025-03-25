@@ -4,6 +4,7 @@ import LoginPage from "@/app/auth/login/page";
 import "@testing-library/jest-dom";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 jest.mock("next-auth/react", () => ({
   signIn: jest.fn(),
@@ -48,11 +49,35 @@ describe("LoginPage", () => {
 
     expect(screen.getByRole("textbox", { name: /email/i })).toBeInTheDocument();
 
-    // expect(
-    //   screen.getByRole("textbox", { name: /password/i })
-    // ).toBeInTheDocument();
-
     expect(screen.getByRole("img", { name: /logo/i })).toBeInTheDocument();
+  });
+
+  it("submits the login form with correct credentials", async () => {
+    (signIn as jest.Mock).mockResolvedValue({ error: null });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "test@example.com" },
+    });
+
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: "password123" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
+
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalledWith("credentials", {
+        redirect: false,
+        email: "test@example.com",
+        password: "password123",
+      });
+    });
+
+    expect(toast).toHaveBeenCalledWith("Login successful. Welcome back!");
+
+    expect(mockPush).toHaveBeenCalledWith("/");
   });
 });
 
