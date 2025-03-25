@@ -7,7 +7,7 @@ export default function MyJournalLayout({ children }: { children: ReactNode }) {
     <SidebarProvider>
       <JournalSidebar />
       <main>
-        <SidebarTrigger />
+        <SidebarTrigger className="[existing classes] bg-orange-100 hover:bg-orange-200" />
         {children}
       </main>
     </SidebarProvider>
