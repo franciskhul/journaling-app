@@ -120,6 +120,32 @@ describe("LoginPage", () => {
       expect(buttonAfterSubmit).toBeInTheDocument();
     });
   });
+
+  it("shows error message when login fails", async () => {
+    (signIn as jest.Mock).mockResolvedValue({ error: "Invalid credentials" });
+
+    render(<LoginPage />);
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "wrong@example.com" },
+    });
+
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: "wrongpassword" },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /login/i }));
+
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalledWith("credentials", {
+        redirect: false,
+        email: "wrong@example.com",
+        password: "wrongpassword",
+      });
+    });
+
+    expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+  });
 });
 
 // // type MockSignInResponse =
