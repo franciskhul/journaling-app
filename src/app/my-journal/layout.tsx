@@ -21,7 +21,35 @@ export default async function MyJournalLayout({
         <JournalHeader />
 
         {/* Main content area with scroll */}
-        <main className="flex-1 overflow-auto">{children}</main>
+
+        <main
+          className="flex-1 overflow-auto relative 
+            bg-[#f9f6f0] 
+            bg-[url('/cream-paper.png')] bg-opacity-5
+            bg-[length:300px_300px]
+        "
+        >
+          <svg
+            className="absolute top-0 left-0 w-32 h-32 opacity-10 pointer-events-none"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,0 L100,0 L100,100 Q80,60 0,100 Z" fill="#d4a373" />
+          </svg>
+          <svg
+            className="absolute bottom-0 right-0 w-32 h-32 opacity-10 pointer-events-none rotate-180"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
+            <path d="M0,0 L100,0 L100,100 Q80,60 0,100 Z" fill="#d4a373" />
+          </svg>
+          <div className="p-6 min-h-full font-serif text-amber-900/90">
+            {children}
+          </div>
+          {/* <div className="absolute bottom-8 right-8 text-6xl text-amber-200/50 pointer-events-none">
+            ✍️
+          </div> */}
+        </main>
       </SidebarInset>
       {/* </div> */}
     </SidebarProvider>
