@@ -178,7 +178,7 @@ describe("LoginPage", () => {
   it("has correct registration link", () => {
     render(<LoginPage />);
     const signUpLink = screen.getByRole("link", { name: /sign up/i });
-    expect(signUpLink).toHaveAttribute("href", "/auth/registration");
+    expect(signUpLink).toHaveAttribute("href", "/");
   });
 
   it("toggles password visibility when clicking the eye icon", async () => {
