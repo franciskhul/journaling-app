@@ -44,7 +44,7 @@ export function JournalSidebar() {
         style={{ width: "inherit", backgroundSize: "cover" }}
       />
       <div className="absolute left-1/2 top-0 h-full w-px bg-amber-800/50 transform -translate-x-1/2" />
-      <SidebarContent className="bg-[url('/texture.png')] bg-opacity-10">
+      <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel
             className="
@@ -58,7 +58,9 @@ export function JournalSidebar() {
           >
             <span className="flex items-center">
               <BookHeart />
-              <span>My Journal</span>
+              <span className="text-lg font-bold text-amber-900">
+                My Journal
+              </span>
             </span>
 
             <SidebarGroupAction>
