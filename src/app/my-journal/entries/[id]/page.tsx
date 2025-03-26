@@ -21,7 +21,11 @@ export interface JournalEntry {
   contentSummary: string;
 }
 
-export default function EntryPage({ params }: { params: { id: string } }) {
+export default function JournalEntryPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   // Fetch your entry data here (mock data for example)
   const entry: JournalEntry = {
     id: params.id,
@@ -49,10 +53,13 @@ export default function EntryPage({ params }: { params: { id: string } }) {
           </Button>
         </Link>
         <div className="flex gap-2">
-          <Button variant="outline" className="font-alumni gap-2">
-            <Edit className="h-4 w-4" />
-            Edit
-          </Button>
+          <Link href={`/my-journal/entries/${entry.id}/edit`}>
+            <Button variant="outline" className="font-alumni gap-2">
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>
+          </Link>
+
           <Button variant="destructive" className="font-alumni gap-2">
             <Trash2 className="h-4 w-4" />
             Delete

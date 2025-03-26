@@ -104,35 +104,16 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
             </div>
 
             <div className="flex gap-1">
-              <Button variant="outline" className="font-alumni gap-2">
-                <Edit className="h-4 w-4" />
-                Edit
-              </Button>
+              <Link href={`/my-journal/entries/${id}/edit`}>
+                <Button variant="outline" className="font-alumni gap-2">
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
+              </Link>
               <Button variant="destructive" className="font-alumni gap-2">
                 <Trash2 className="h-4 w-4" />
                 Delete
               </Button>
-              {/* <Button
-                variant="ghost"
-                size="sm"
-                className="p-1 h-8 text-amber-600"
-              >
-                <Bookmark className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-1 h-8 text-amber-600"
-              >
-                <Edit2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="p-1 h-8 text-red-400"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button> */}
             </div>
           </CardFooter>
         </div>
