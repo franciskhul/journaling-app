@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Select,
   SelectContent,
@@ -22,7 +23,8 @@ export function JournalHeader() {
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 px-6 py-3 flex items-center justify-between">
+    <header className="sticky top-0 z-10 flex h-12 items-center gap-4 px-4 sm:px-6  bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 justify-between">
+      <SidebarTrigger className="[existing classes] bg-orange-100 hover:bg-orange-200 -ml-2" />
       {/* Month/Year Picker */}
       <Popover>
         <PopoverTrigger asChild>

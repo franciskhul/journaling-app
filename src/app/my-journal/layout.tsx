@@ -1,21 +1,29 @@
 import { ReactNode } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { cookies } from "next/headers";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { JournalSidebar } from "@/components/my-journal/journal-sidebar";
 import { JournalHeader } from "@/components/my-journal/journal-header";
+// import styles from "./my-journal-layout.module.css";
 
-export default function MyJournalLayout({ children }: { children: ReactNode }) {
+export default async function MyJournalLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
   return (
-    <SidebarProvider>
-      <div className="flex h-screen">
-        <JournalSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <JournalHeader />
-          <main>
-            <SidebarTrigger className="[existing classes] bg-orange-100 hover:bg-orange-200" />
-            {children}
-          </main>
-        </div>
-      </div>
+    <SidebarProvider defaultOpen={defaultOpen}>
+      <JournalSidebar />
+
+      {/* Right-hand content area */}
+      <SidebarInset>
+        <JournalHeader />
+
+        {/* Main content area with scroll */}
+        <main className="flex-1 overflow-auto">{children}</main>
+      </SidebarInset>
+      {/* </div> */}
     </SidebarProvider>
   );
 }
