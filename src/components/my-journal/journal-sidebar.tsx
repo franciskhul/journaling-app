@@ -19,7 +19,7 @@ import {
 const items = [
   {
     title: "My Entries",
-    url: "/my-journal/entries",
+    url: "/my-journal",
     icon: Newspaper,
   },
   {
