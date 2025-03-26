@@ -20,6 +20,8 @@ module.exports = {
       },
       fontFamily: {
         serif: ['"Cormorant Garamond"', "serif"],
+        fugaz: ["var(--font-fugaz)", "sans-serif"],
+        alumni: ["var(--font-alumni)", "sans-serif"],
       },
     },
   },

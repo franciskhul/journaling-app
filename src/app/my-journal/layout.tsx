@@ -43,9 +43,7 @@ export default async function MyJournalLayout({
           >
             <path d="M0,0 L100,0 L100,100 Q80,60 0,100 Z" fill="#d4a373" />
           </svg>
-          <div className="p-6 min-h-full font-serif text-amber-900/90">
-            {children}
-          </div>
+          <div className="p-6 min-h-full">{children}</div>
           {/* <div className="absolute bottom-8 right-8 text-6xl text-amber-200/50 pointer-events-none">
             ✍️
           </div> */}

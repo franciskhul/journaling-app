@@ -1,14 +1,34 @@
+// components/FontProvider.tsx
 "use client";
 
-import { Cormorant_Garamond } from "next/font/google";
+import { Fugaz_One, Alumni_Sans } from "next/font/google";
 import { ReactNode } from "react";
 
-const serif = Cormorant_Garamond({
+const fugaz = Fugaz_One({
+  weight: "400",
   subsets: ["latin"],
-  weight: ["400", "600"],
-  variable: "--font-serif",
+  variable: "--font-fugaz",
+  display: "swap",
+});
+
+const alumni = Alumni_Sans({
+  subsets: ["latin"],
+  variable: "--font-alumni",
+  display: "swap",
+  // Adjust weights as needed
+  weight: ["400", "600", "700"],
 });
 
 export default function FontProvider({ children }: { children: ReactNode }) {
-  return <div className={`${serif.variable} font-sans`}>{children}</div>;
+  return (
+    <div
+      className={`${fugaz.variable} ${alumni.variable} font-sans`}
+      style={{
+        // Fallback fonts in case the variables don't work
+        fontFamily: `${fugaz.style.fontFamily}, ${alumni.style.fontFamily}, sans-serif`,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
