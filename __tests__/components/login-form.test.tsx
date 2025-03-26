@@ -65,7 +65,12 @@ describe("LoginForm", () => {
   });
 
   it("submits the form successfully", async () => {
-    (signIn as jest.Mock).mockResolvedValue({ error: null });
+    (signIn as jest.Mock).mockImplementation(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ error: null }), 1000)
+        )
+    );
     render(<LoginForm />);
 
     // Fill out form
@@ -84,7 +89,11 @@ describe("LoginForm", () => {
     );
 
     // // Check loading state
-    // expect(screen.getByText("Signing In...")).toBeInTheDocument();
+    const loadingButton = await screen.findByRole("button", {
+      name: /signing In.../i,
+    });
+
+    expect(loadingButton).toBeInTheDocument();
 
     await waitFor(() => {
       expect(mockSignIn).toHaveBeenCalledWith("credentials", {
@@ -92,9 +101,8 @@ describe("LoginForm", () => {
         email: "test@example.com",
         password: "password123",
       });
+      expect(mockPush).toHaveBeenCalledWith("/my-journal");
     });
-
-    expect(mockPush).toHaveBeenCalledWith("/my-journal");
   });
 
   it("handles login errors", async () => {
