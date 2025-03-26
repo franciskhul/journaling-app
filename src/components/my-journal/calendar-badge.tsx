@@ -27,7 +27,7 @@ export function CalendarBadge({ date, className = "" }: CalendarDateProps) {
       </div>
 
       {/* Day name - Bottom */}
-      <div className="absolute -bottom-3 text-xs font-medium text-amber-700">
+      <div className="absolute -bottom-4 text-xs font-medium text-amber-700">
         {format(date, "EEE")}
       </div>
     </div>
