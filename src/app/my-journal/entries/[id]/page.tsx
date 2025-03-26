@@ -42,7 +42,7 @@ export default function EntryPage({ params }: { params: { id: string } }) {
     <div className="p-6 max-w-3xl mx-auto">
       {/* Back Button and Actions */}
       <div className="flex items-center justify-between mb-8">
-        <Link href="/journal">
+        <Link href="/my-journal">
           <Button variant="ghost" className="font-alumni gap-2">
             <ArrowLeft className="h-4 w-4" />
             Back to Journal

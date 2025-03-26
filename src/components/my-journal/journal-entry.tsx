@@ -6,8 +6,9 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Edit, Trash2, Clock, Tag } from "lucide-react";
+import { ArrowRight, Edit, Trash2, Clock, Tag } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -39,7 +40,7 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
 
   return (
     <Card
-      className="border-2 border-yellow-100 bg-yellow-50 hover:shadow-md transition-all max-w-7xl mx-auto"
+      className="border-2 border-yellow-100 bg-yellow-50 hover:shadow-md transition-all max-w-6xl mx-auto"
       key={id}
     >
       <div className="flex">
@@ -52,7 +53,7 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
         <div className="flex-1 p-4">
           <CardHeader className="pb-2">
             <div className="flex items-center gap-3 mb-2 justify-between">
-              <div className="flex gab-3">
+              <div className="flex items-center gap-3">
                 <CardTitle className="font-fugaz text-3xl text-neutral-900">
                   {title}
                 </CardTitle>
@@ -70,9 +71,12 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
               </div>
 
               <div>
-                <Button variant="ghost" className="p-1 text-3xl text-amber-600">
-                  <Bookmark className="h-10 w-4" />
-                </Button>
+                <Link href={`/my-journal/entries/${id}`}>
+                  <Button variant="ghost" className="font-alumni gap-2">
+                    <ArrowRight className="h-4 w-4" />
+                    View Journal Entry
+                  </Button>
+                </Link>
               </div>
             </div>
           </CardHeader>
