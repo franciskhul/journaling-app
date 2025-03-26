@@ -2,16 +2,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginForm from "@/components/login/login-form";
 import { signIn } from "next-auth/react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-// Mock the necessary modules
 jest.mock("next-auth/react");
 jest.mock("sonner");
 jest.mock("next/navigation");
 
 const mockSignIn = signIn as jest.Mock;
-const mockToast = toast as jest.Mocked<typeof toast>;
 const mockPush = jest.fn();
 
 (useRouter as jest.Mock).mockReturnValue({
@@ -27,7 +24,6 @@ describe("LoginForm", () => {
   it("renders the login form correctly", () => {
     render(<LoginForm />);
 
-    // Check form elements are present
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(
@@ -68,51 +64,66 @@ describe("LoginForm", () => {
     expect(await screen.findByText("Password is required")).toBeInTheDocument();
   });
 
-  // it("submits the form successfully", async () => {
-  //   (signIn as jest.Mock).mockResolvedValue({ error: null });
-  //   render(<LoginForm />);
+  it("submits the form successfully", async () => {
+    (signIn as jest.Mock).mockResolvedValue({ error: null });
+    render(<LoginForm />);
 
-  //   // Fill out form
-  //   fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
-  //     target: { value: "test@example.com" },
-  //   });
+    // Fill out form
+    fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
+      target: { value: "test@example.com" },
+    });
 
-  //   fireEvent.change(
-  //     screen.getByLabelText(/password/i, { selector: "input" }),
-  //     {
-  //       target: { value: "password123" },
-  //     }
-  //   );
-  //   fireEvent.click(screen.getByRole("button", { name: /login/i }));
+    fireEvent.change(
+      screen.getByLabelText(/password/i, { selector: "input" }),
+      {
+        target: { value: "password123" },
+      }
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue journaling/i })
+    );
 
-  //   // // Check loading state
-  //   // expect(screen.getByText("Signing In...")).toBeInTheDocument();
+    // // Check loading state
+    // expect(screen.getByText("Signing In...")).toBeInTheDocument();
 
-  //   await waitFor(() => {
-  //     expect(mockSignIn).toHaveBeenCalledWith("credentials", {
-  //       redirect: false,
-  //       email: "test@example.com",
-  //       password: "password123",
-  //     });
-  //   });
+    await waitFor(() => {
+      expect(mockSignIn).toHaveBeenCalledWith("credentials", {
+        redirect: false,
+        email: "test@example.com",
+        password: "password123",
+      });
+    });
 
-  //   expect(mockToast).toHaveBeenCalledWith("Welcome back to your journal!");
-  //   expect(mockPush).toHaveBeenCalledWith("/my-journal");
-  // });
+    expect(mockPush).toHaveBeenCalledWith("/my-journal");
+  });
 
-  // it("handles login errors", async () => {
-  //   mockSignIn.mockResolvedValueOnce({ error: "Invalid credentials" });
-  //   render(<LoginForm />);
+  it("handles login errors", async () => {
+    (signIn as jest.Mock).mockResolvedValue({ error: "Invalid credentials" });
+    render(<LoginForm />);
 
-  //   // Fill out form
-  //   await fireEvent.type(screen.getByLabelText("Email"), "test@example.com");
-  //   await fireEvent.type(screen.getByLabelText("Password"), "wrongpassword");
-  //   await fireEvent.click(
-  //     screen.getByRole("button", { name: "Continue Journaling" })
-  //   );
+    // Fill out form
+    fireEvent.change(screen.getByLabelText(/email/i, { selector: "input" }), {
+      target: { value: "wrong@example.com" },
+    });
 
-  //   await waitFor(() => {
-  //     expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-  //   });
-  // });
+    fireEvent.change(
+      screen.getByLabelText(/password/i, { selector: "input" }),
+      {
+        target: { value: "wrongpassword" },
+      }
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /Continue Journaling/i })
+    );
+
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalledWith("credentials", {
+        redirect: false,
+        email: "wrong@example.com",
+        password: "wrongpassword",
+      });
+      expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
+    });
+  });
 });
