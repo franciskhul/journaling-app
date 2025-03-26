@@ -9,7 +9,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 sm:p-10">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="h-6 w-6 text-amber-500" />
+            <Sparkles
+              className="h-6 w-6 text-amber-500"
+              data-testid="sparkles-icon"
+            />
             <h2 className="font-fugaz text-3xl bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent">
               Welcome Back
             </h2>
@@ -19,7 +22,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* LoginForm Goes Here */}
         <LoginForm />
 
         <div className="mt-6 text-center">
