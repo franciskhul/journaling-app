@@ -63,4 +63,27 @@ describe("RegistrationForm", () => {
     expect(passwordInput).toHaveAttribute("type", "password");
     expect(confirmInput).toHaveAttribute("type", "password");
   });
+
+  it("shows validation errors for empty form submission", async () => {
+    render(<RegistrationForm />);
+    const submitButton = screen.getByRole("button", {
+      name: /Start Journaling/,
+    });
+
+    await fireEvent.click(submitButton);
+
+    // Check all required field errors
+    expect(
+      await screen.findByText("Full name is required")
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please enter a valid email address")
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Password must be at least 8 characters")
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText("Please confirm your password")
+    ).toBeInTheDocument();
+  });
 });
