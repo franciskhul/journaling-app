@@ -29,7 +29,9 @@ export default function ChartCard({
           </CardDescription>
         )}
       </CardHeader>
-      <CardContent className="h-64">{children}</CardContent>
+      <CardContent className="h-full flex items-center justify-center bg-amber-50 rounded-lg">
+        {children}
+      </CardContent>
     </Card>
   );
 }
