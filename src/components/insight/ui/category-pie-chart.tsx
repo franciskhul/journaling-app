@@ -16,7 +16,7 @@ const chartData = [
 
 const chartConfig = {
   entries: {
-    label: "Entries",
+    label: "Journal Entries",
   },
   travel: {
     label: "travel",
