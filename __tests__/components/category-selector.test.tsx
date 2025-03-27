@@ -115,4 +115,25 @@ describe("CategorySelector", () => {
     const checkIcon = within(workItem).getByTestId("check-icon"); // or getByTestId("check-icon")
     expect(checkIcon).toHaveClass("opacity-100");
   });
+
+  it("shows add new category option when no matches found", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+    await fireEvent.change(
+      screen.getByPlaceholderText("Search or add category..."),
+      {
+        target: { value: "New Category" },
+      }
+    );
+
+    expect(screen.getByText('Add "New Category"')).toBeInTheDocument();
+  });
 });
