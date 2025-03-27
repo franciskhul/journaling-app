@@ -1,45 +1,69 @@
 import { db } from "@/lib/db";
 import { generateAccessToken, generateRefreshToken } from "./jwt";
+import { AUTH_CONFIG } from "@/lib/config/auth";
 
 export async function saveRefreshToken(userId: string) {
   const refreshToken = generateRefreshToken({ id: userId });
+  const expiresAt = new Date(
+    Date.now() + AUTH_CONFIG.REFRESH_TOKEN_EXPIRATION_TIME
+  ); // 7 days (604,800 seconds)
 
-  await db.refreshToken.create({
-    data: {
-      userId,
-      token: refreshToken,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    },
-  });
+  await db.$transaction([
+    // Delete any existing tokens for the user (optional)
+    db.refreshToken.deleteMany({
+      where: { userId },
+    }),
+    // Create new token
+    db.refreshToken.create({
+      data: {
+        userId,
+        token: refreshToken,
+        expiresAt,
+      },
+    }),
+  ]);
 
   return refreshToken;
 }
 
-export async function refreshAccessToken(refreshToken: string) {
+export async function refreshAccessToken(
+  refreshToken: string
+): Promise<[string, string]> {
+  // Verify token exists and isn't expired
   const tokenRecord = await db.refreshToken.findUnique({
     where: { token: refreshToken },
-    select: { userId: true, expiresAt: true },
+    include: { user: { select: { id: true, email: true, role: true } } },
   });
 
-  if (!tokenRecord) {
-    throw new Error("Invalid refresh token");
+  if (!tokenRecord?.user || new Date() > tokenRecord.expiresAt) {
+    // Auto-cleanup invalid tokens
+    await db.refreshToken.deleteMany({
+      where: { token: refreshToken },
+    });
+    throw new Error("Invalid or expired refresh token");
   }
 
-  if (new Date() > tokenRecord.expiresAt) {
-    throw new Error("Refresh token has expired. Please log in again.");
-  }
+  // Transaction for atomic operations
+  const [newAccessToken, newRefreshToken] = await db.$transaction(
+    async (tx) => {
+      // Delete old token
+      await tx.refreshToken.delete({
+        where: { token: refreshToken },
+      });
 
-  const user = await db.user.findUnique({
-    where: { id: tokenRecord.userId },
-    select: { email: true, role: true, id: true },
-  });
+      // Generate new tokens
+      const newRefreshToken = await saveRefreshToken(tokenRecord.userId);
+      const newAccessToken = generateAccessToken({
+        id: tokenRecord.user.id,
+        email: tokenRecord.user.email,
+        role: tokenRecord.user.role as "ADMIN" | "USER",
+      });
 
-  if (!user) {
-    throw new Error("Invalid refresh token");
-  }
+      return [newAccessToken, newRefreshToken];
+    }
+  );
 
-  const newAccessToken = generateAccessToken(user);
-  return newAccessToken;
+  return [newAccessToken, newRefreshToken];
 }
 
 export async function getRefreshToken(userId: string) {
