@@ -1,6 +1,5 @@
 // __tests__/components/CategorySelector.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { CategorySelector } from "@/components/my-journal/category-selector";
 import { Plus, Check } from "lucide-react";
 
@@ -30,5 +29,34 @@ describe("CategorySelector", () => {
 
     expect(screen.getByText("Work")).toBeInTheDocument();
     expect(screen.getByRole("combobox")).toBeInTheDocument();
+  });
+
+  it('shows "Select category..." when no value is selected', () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    expect(screen.getByText("Select category...")).toBeInTheDocument();
+  });
+
+  it("opens popover when clicked", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+    expect(
+      screen.getByPlaceholderText("Search or add category...")
+    ).toBeInTheDocument();
   });
 });
