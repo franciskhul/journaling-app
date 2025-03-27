@@ -16,17 +16,25 @@ import {
 } from "@/components/ui/command";
 import { useState } from "react";
 
-const defaultCategories = [
-  { value: "1", label: "Personal" },
-  { value: "2", label: "Work" },
-  { value: "3", label: "Travel" },
-];
+export type CategoryType = {
+  value: string;
+  label: string;
+};
 
-export function CategorySelector() {
+interface CategorySelectorProps {
+  selectedCategoryValue: string;
+  categories: CategoryType[];
+  addCategoryAction: (newCategoryVal: string) => void;
+  onChangeAction: (categoryVal: string) => void;
+}
+
+export function CategorySelector({
+  selectedCategoryValue,
+  categories,
+  addCategoryAction,
+  onChangeAction,
+}: CategorySelectorProps) {
   const [open, setOpen] = useState(false);
-  const [categories, setCategories] = useState(defaultCategories);
-  const [selectedCategory, setSelectedCategory] = useState("");
-
   const [newCategory, setNewCategory] = useState("");
 
   const handleAddCategory = () => {
@@ -34,12 +42,8 @@ export function CategorySelector() {
       newCategory.trim() &&
       !categories.some((c) => c.value === newCategory.toLowerCase())
     ) {
-      const newCat = {
-        value: newCategory.toLowerCase(),
-        label: newCategory.charAt(0).toUpperCase() + newCategory.slice(1),
-      };
-      setCategories([...categories, newCat]);
-      setSelectedCategory(newCat.value);
+      addCategoryAction(newCategory);
+      onChangeAction(newCategory.toLowerCase());
       setNewCategory("");
       setOpen(false);
     }
@@ -54,9 +58,10 @@ export function CategorySelector() {
           aria-expanded={open}
           className="w-full justify-between font-alumni text-base"
         >
-          {selectedCategory
-            ? categories.find((category) => category.value === selectedCategory)
-                ?.label
+          {selectedCategoryValue
+            ? categories.find(
+                (category) => category.value === selectedCategoryValue
+              )?.label
             : "Select category..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
@@ -85,14 +90,14 @@ export function CategorySelector() {
                 key={category.value}
                 value={category.value}
                 onSelect={() => {
-                  setSelectedCategory(category.value);
+                  onChangeAction(category.value); // Update form value
                   setOpen(false);
                 }}
                 className="font-alumni"
               >
                 <Check
                   className={`mr-2 h-4 w-4 ${
-                    selectedCategory === category.value
+                    selectedCategoryValue === category.value
                       ? "opacity-100"
                       : "opacity-0"
                   }`}
