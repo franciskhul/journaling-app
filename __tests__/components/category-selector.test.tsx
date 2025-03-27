@@ -59,4 +59,21 @@ describe("CategorySelector", () => {
       screen.getByPlaceholderText("Search or add category...")
     ).toBeInTheDocument();
   });
+
+  it("displays all categories in popover", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+
+    expect(screen.getByText(/personal/i)).toBeInTheDocument();
+    expect(screen.getByText(/work/i)).toBeInTheDocument();
+    expect(screen.getByText(/Travel/i)).toBeInTheDocument();
+  });
 });
