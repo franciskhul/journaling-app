@@ -1,4 +1,3 @@
-// __tests__/components/RegistrationForm.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RegistrationForm from "@/components/registration/registration-form";
 // import RegistrationForm from "@/components/RegistrationForm";
