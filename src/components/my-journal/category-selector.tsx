@@ -17,9 +17,9 @@ import {
 import { useState } from "react";
 
 const defaultCategories = [
-  { value: "personal", label: "Personal" },
-  { value: "work", label: "Work" },
-  { value: "travel", label: "Travel" },
+  { value: "1", label: "Personal" },
+  { value: "2", label: "Work" },
+  { value: "3", label: "Travel" },
 ];
 
 export function CategorySelector() {
