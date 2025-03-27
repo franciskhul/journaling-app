@@ -159,4 +159,25 @@ describe("CategorySelector", () => {
     expect(mockAddCategory).toHaveBeenCalledWith("New Category");
     expect(mockOnChange).toHaveBeenCalledWith("new category");
   });
+
+  it("does not allow adding duplicate categories", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+    await fireEvent.change(
+      screen.getByPlaceholderText("Search or add category..."),
+      {
+        target: { value: "New Category" },
+      }
+    );
+
+    expect(screen.queryByText('Add "Work"')).not.toBeInTheDocument();
+  });
 });
