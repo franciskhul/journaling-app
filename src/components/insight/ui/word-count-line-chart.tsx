@@ -29,9 +29,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function Component() {
+export default function WordCountLineChart() {
   return (
-    <ChartContainer config={chartConfig} className="py-5 px-2">
+    <ChartContainer config={chartConfig}>
       <LineChart
         accessibilityLayer
         data={chartData}
