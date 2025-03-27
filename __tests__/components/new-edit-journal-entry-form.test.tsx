@@ -91,6 +91,18 @@ describe("NewEditJournalEntryForm", () => {
       expect(
         await screen.findByText("Content must be at least 4 characters")
       ).toBeInTheDocument();
+
+      await fireEvent.change(contentInput, {
+        target: { value: "a".repeat(5001) },
+      });
+
+      await fireEvent.click(
+        screen.getByRole("button", { name: /create entry/i })
+      );
+
+      expect(
+        await screen.findByText("Content is too long")
+      ).toBeInTheDocument();
     });
   });
 });
