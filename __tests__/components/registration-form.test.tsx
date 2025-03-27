@@ -135,6 +135,22 @@ describe("RegistrationForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("validates password must contain at least one number", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", {
+      name: /start journaling/i,
+    });
+
+    await fireEvent.change(passwordInput, { target: { value: "invalidPass" } });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText(/must contain at least one number/i)
+    ).toBeInTheDocument();
+  });
+
   it("validates password match", async () => {
     render(<RegistrationForm />);
     const passwordInput = screen.getByLabelText("Password");
