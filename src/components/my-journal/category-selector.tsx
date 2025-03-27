@@ -94,6 +94,7 @@ export function CategorySelector({
                   setOpen(false);
                 }}
                 className="font-alumni"
+                data-testid={`category-${category.label.toLowerCase()}`}
               >
                 <Check
                   className={`mr-2 h-4 w-4 ${
@@ -101,6 +102,7 @@ export function CategorySelector({
                       ? "opacity-100"
                       : "opacity-0"
                   }`}
+                  data-testid="check-icon"
                 />
                 {category.label}
               </CommandItem>
