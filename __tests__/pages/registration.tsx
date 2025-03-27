@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import GetStartedPage from "@/app/(registration)/page";
+import RegistrationPage from "@/app/(registration)/page";
 
 // Mock the RegistrationForm component
 jest.mock("@/components/registration/registration-form", () => ({
@@ -13,9 +13,9 @@ jest.mock("next/image", () => ({
   default: (props: any) => <img {...props} />,
 }));
 
-describe("GetStartedPage", () => {
+describe("RegistrationPage", () => {
   beforeEach(() => {
-    render(<GetStartedPage />);
+    render(<RegistrationPage />);
   });
 
   it("displays the sparkle icon and heading", () => {
