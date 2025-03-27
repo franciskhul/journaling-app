@@ -25,12 +25,12 @@ const journalEntrySchema = z.object({
   title: z
     .string()
     .min(1, "Title is required")
-    .max(100, "Title must be less than 100 characters"),
+    .max(200, "Title must be less than 200 characters"),
   category: z.string().min(1, "Please select a category"),
   content: z
     .string()
-    .min(10, "Entry must be at least 10 characters")
-    .max(5000, "Entry is too long"),
+    .min(4, "Content must be at least 4 characters")
+    .max(5000, "Content is too long"),
 });
 
 interface NewEditJournalEntryForm {
