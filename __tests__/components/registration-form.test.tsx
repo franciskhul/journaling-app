@@ -151,6 +151,24 @@ describe("RegistrationForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("validates password must contain at least one special character", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", {
+      name: /start journaling/i,
+    });
+
+    await fireEvent.change(passwordInput, {
+      target: { value: "invalidPass10" },
+    });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText(/must contain at least one special character/i)
+    ).toBeInTheDocument();
+  });
+
   it("validates password match", async () => {
     render(<RegistrationForm />);
     const passwordInput = screen.getByLabelText("Password");
@@ -159,9 +177,11 @@ describe("RegistrationForm", () => {
       name: /Start Journaling/,
     });
 
-    await fireEvent.change(passwordInput, { target: { value: "password123" } });
+    await fireEvent.change(passwordInput, {
+      target: { value: "invalidPass10;" },
+    });
     await fireEvent.change(confirmInput, {
-      target: { value: "differentpassword" },
+      target: { value: "differentPassword10;" },
     });
 
     await fireEvent.click(submitButton);
