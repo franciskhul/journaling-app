@@ -26,6 +26,7 @@ interface CategorySelectorProps {
   categories: CategoryType[];
   addCategoryAction: (newCategoryVal: string) => void;
   onChangeAction: (categoryVal: string) => void;
+  id?: string;
 }
 
 export function CategorySelector({
@@ -33,6 +34,7 @@ export function CategorySelector({
   categories,
   addCategoryAction,
   onChangeAction,
+  id,
 }: CategorySelectorProps) {
   const [open, setOpen] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -57,6 +59,7 @@ export function CategorySelector({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between font-alumni text-base"
+          id={id}
         >
           {selectedCategoryValue
             ? categories.find(

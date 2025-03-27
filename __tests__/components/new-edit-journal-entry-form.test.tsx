@@ -105,4 +105,24 @@ describe("NewEditJournalEntryForm", () => {
       ).toBeInTheDocument();
     });
   });
+
+  describe("Category Selection", () => {
+    it("allows selecting a category", async () => {
+      render(<NewEditJournalEntryForm editing={false} />);
+
+      const categorySelector = screen.getByLabelText("Category");
+      await fireEvent.click(categorySelector);
+
+      await waitFor(() => {
+        expect(screen.getByText("Personal")).toBeInTheDocument();
+      });
+
+      await fireEvent.click(screen.getByText("Work"));
+
+      await waitFor(() => {
+        const categoryButton = screen.getByRole("combobox");
+        expect(categoryButton).toHaveTextContent(/work/i);
+      });
+    });
+  });
 });

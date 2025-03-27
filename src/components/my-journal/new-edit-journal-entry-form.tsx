@@ -101,12 +101,16 @@ export default function NewEditJournalEntryForm({
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-alumni font-semibold text-lg flex items-center gap-2">
+              <FormLabel
+                className="font-alumni font-semibold text-lg flex items-center gap-2"
+                htmlFor="category-selector"
+              >
                 <Tag className="h-5 w-5" data-testid="category-tag-icon" />
                 Category
               </FormLabel>
               <FormControl>
                 <CategorySelector
+                  id={"category-selector"}
                   selectedCategoryValue={field.value}
                   onChangeAction={field.onChange}
                   categories={categories}
