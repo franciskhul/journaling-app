@@ -94,7 +94,7 @@ describe("RegistrationForm", () => {
       name: /start journaling/i,
     });
 
-    await fireEvent.change(passwordInput, { target: { value: "shrt" } });
+    await fireEvent.change(passwordInput, { target: { value: "invalid" } });
 
     await fireEvent.click(submitButton);
 
@@ -110,12 +110,28 @@ describe("RegistrationForm", () => {
       name: /start journaling/i,
     });
 
-    await fireEvent.change(passwordInput, { target: { value: "password7" } });
+    await fireEvent.change(passwordInput, { target: { value: "invalidpass" } });
 
     await fireEvent.click(submitButton);
 
     expect(
       await screen.findByText(/must contain at least one uppercase letter/i)
+    ).toBeInTheDocument();
+  });
+
+  it("validates password must contain at least one lowercase letter", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", {
+      name: /start journaling/i,
+    });
+
+    await fireEvent.change(passwordInput, { target: { value: "INVALIDPASS" } });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText(/must contain at least one lowercase letter/i)
     ).toBeInTheDocument();
   });
 
