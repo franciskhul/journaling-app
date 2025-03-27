@@ -1,5 +1,11 @@
 // __tests__/components/CategorySelector.test.tsx
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { CategorySelector } from "@/components/my-journal/category-selector";
 import { Plus, Check } from "lucide-react";
 
@@ -74,7 +80,7 @@ describe("CategorySelector", () => {
 
     expect(screen.getByText(/personal/i)).toBeInTheDocument();
     expect(screen.getByText(/work/i)).toBeInTheDocument();
-    expect(screen.getByText(/Travel/i)).toBeInTheDocument();
+    expect(screen.getByText(/travel/i)).toBeInTheDocument();
   });
 
   it("calls onChange when selecting a category", async () => {
@@ -91,5 +97,22 @@ describe("CategorySelector", () => {
     await fireEvent.click(screen.getByText("Personal"));
 
     expect(mockOnChange).toHaveBeenCalledWith("personal");
+  });
+
+  it("shows checkmark for selected category", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue="work"
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+
+    const workItem = screen.getByTestId("category-work");
+    const checkIcon = within(workItem).getByTestId("check-icon"); // or getByTestId("check-icon")
+    expect(checkIcon).toHaveClass("opacity-100");
   });
 });
