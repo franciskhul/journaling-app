@@ -73,6 +73,8 @@ declare module "next-auth" {
  *         description: Invalid credentials.
  */
 export const authOptions: AuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
     maxAge: TOKEN_EXPIRATION_TIME,
@@ -88,6 +90,7 @@ export const authOptions: AuthOptions = {
         });
         token.refreshToken = await saveRefreshToken(user.id);
         token.exp = currentTime + TOKEN_EXPIRATION_TIME;
+        token.role = user.role;
       } else if (currentTime > (token.exp as number)) {
         try {
           const newAccessToken = await refreshAccessToken(
@@ -121,7 +124,6 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
-  debug: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
