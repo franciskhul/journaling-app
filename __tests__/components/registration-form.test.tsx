@@ -103,6 +103,22 @@ describe("RegistrationForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("validates password must contain at least one uppercase letter", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", {
+      name: /start journaling/i,
+    });
+
+    await fireEvent.change(passwordInput, { target: { value: "password7" } });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText(/must contain at least one uppercase letter/i)
+    ).toBeInTheDocument();
+  });
+
   it("validates password match", async () => {
     render(<RegistrationForm />);
     const passwordInput = screen.getByLabelText("Password");
