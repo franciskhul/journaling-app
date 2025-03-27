@@ -86,4 +86,20 @@ describe("RegistrationForm", () => {
       await screen.findByText("Please confirm your password")
     ).toBeInTheDocument();
   });
+
+  it("validates password length", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const submitButton = screen.getByRole("button", {
+      name: /start journaling/i,
+    });
+
+    await fireEvent.change(passwordInput, { target: { value: "shrt" } });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText("Password must be at least 8 characters")
+    ).toBeInTheDocument();
+  });
 });
