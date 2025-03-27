@@ -12,7 +12,10 @@ export default function GetStartedPage() {
         <div className="w-full lg:w-1/2 p-8 sm:p-12">
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-6 w-6 text-amber-500" />
+              <Sparkles
+                className="h-6 w-6 text-amber-500"
+                data-testid="sparkles-icon"
+              />
               <h1 className="font-fugaz text-3xl text-center bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent">
                 Get Started
               </h1>
@@ -35,8 +38,11 @@ export default function GetStartedPage() {
           </div>
         </div>
 
-        {/* Right Column - Visual */}
-        <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-amber-100 to-amber-50 items-center justify-center p-8">
+        {/* Right Column - Visual Section */}
+        <div
+          className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-amber-100 to-amber-50 items-center justify-center p-8"
+          data-testid="visual-section"
+        >
           <div className="text-center">
             <Image
               src="/journal-illustration.webp"
