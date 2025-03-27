@@ -136,4 +136,27 @@ describe("CategorySelector", () => {
 
     expect(screen.getByText('Add "New Category"')).toBeInTheDocument();
   });
+
+  it("calls addCategoryAction when adding a new category", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+    await fireEvent.change(
+      screen.getByPlaceholderText("Search or add category..."),
+      {
+        target: { value: "New Category" },
+      }
+    );
+    await fireEvent.click(screen.getByText('Add "New Category"'));
+
+    expect(mockAddCategory).toHaveBeenCalledWith("New Category");
+    expect(mockOnChange).toHaveBeenCalledWith("new category");
+  });
 });
