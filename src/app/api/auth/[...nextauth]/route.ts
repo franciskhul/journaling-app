@@ -3,14 +3,15 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { generateAccessToken } from "@/lib/jwt";
 import { verifyPassword } from "@/lib/auth";
 import { refreshAccessToken, saveRefreshToken } from "@/lib/auth-db";
+import { AUTH_CONFIG } from "@/lib/config/auth";
 import { db } from "@/lib/db";
-
-const TOKEN_EXPIRATION_TIME = 60 * 60 * 24;
 
 declare module "next-auth" {
   interface Session {
-    accessToken: string;
-    refreshToken: string;
+    accessToken?: string;
+    refreshToken?: string;
+    expires?: string;
+    error?: "RefreshFailed" | "InvalidSession";
     user: {
       id: string;
       email: string;
@@ -77,51 +78,74 @@ export const authOptions: AuthOptions = {
   debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
-    maxAge: TOKEN_EXPIRATION_TIME,
+    maxAge: AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
   },
   callbacks: {
     async jwt({ token, user }) {
       const currentTime = Math.floor(Date.now() / 1000);
+
+      // Initial login
       if (user) {
-        token.accessToken = generateAccessToken({
-          id: user.id,
-          email: user.email as string,
-          role: user.role as "ADMIN" | "USER",
-        });
-        token.refreshToken = await saveRefreshToken(user.id);
-        token.exp = currentTime + TOKEN_EXPIRATION_TIME;
-        token.role = user.role;
-      } else if (currentTime > (token.exp as number)) {
+        return {
+          ...token,
+          accessToken: generateAccessToken(user),
+          refreshToken: await saveRefreshToken(user.id),
+          exp: currentTime + AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
+          role: user.role,
+        };
+      }
+
+      // Token refresh
+      if (currentTime > (token.exp as number)) {
         try {
-          const newAccessToken = await refreshAccessToken(
-            token.refreshToken as string
+          if (typeof token.refreshToken !== "string") {
+            throw new Error("Missing refresh token");
+          }
+
+          const [newAccessToken, newRefreshToken] = await refreshAccessToken(
+            token.refreshToken
           );
-          token.accessToken = newAccessToken;
-          token.exp = currentTime + TOKEN_EXPIRATION_TIME;
+
+          return {
+            ...token,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            exp: currentTime + AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
+          };
         } catch (error) {
-          console.error("Failed to refresh access token:", error);
-          throw new Error("Session expired. Please log in again.");
+          console.error("Refresh token error:", error);
+          // Signal frontend to force reauthentication
+          return { ...token, error: "REAUTHENTICATE" };
         }
       }
+
       return token;
     },
 
     async session({ session, token }) {
-      if (typeof token.accessToken === "string") {
-        session.accessToken = token.accessToken;
-      }
-      if (typeof token.refreshToken === "string") {
-        session.refreshToken = token.refreshToken;
-      }
-      if (typeof token.user === "object" && token.user !== null) {
-        session.user = token.user as {
-          id: string;
-          email: string;
-          role: "ADMIN" | "USER";
-        };
-      }
+      const expires =
+        typeof token.exp === "number"
+          ? new Date(token.exp * 1000).toISOString()
+          : undefined;
 
-      return session;
+      return {
+        ...session,
+        ...(expires && { expires }),
+        ...(typeof token.accessToken === "string" && {
+          accessToken: token.accessToken,
+        }),
+        ...(typeof token.refreshToken === "string" && {
+          refreshToken: token.refreshToken,
+        }),
+        ...(token.error
+          ? { error: token.error as "RefreshFailed" | "InvalidSession" }
+          : {}),
+        user: {
+          ...session.user,
+          id: token.sub || session.user.id,
+          role: (token.role as "ADMIN" | "USER") || "USER",
+        },
+      };
     },
   },
   providers: [
