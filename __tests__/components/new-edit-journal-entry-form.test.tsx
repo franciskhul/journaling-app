@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import NewEditJournalEntryForm from "@/components/my-journal/new-edit-journal-entry-form";
 
@@ -122,6 +123,29 @@ describe("NewEditJournalEntryForm", () => {
       await waitFor(() => {
         const categoryButton = screen.getByRole("combobox");
         expect(categoryButton).toHaveTextContent(/work/i);
+      });
+    });
+
+    it("allows adding a new category and automatica selection of new category", async () => {
+      render(<NewEditJournalEntryForm editing={false} />);
+
+      const categorySelector = screen.getByLabelText("Category");
+      await fireEvent.click(categorySelector);
+
+      const searchInput = await screen.findByPlaceholderText(
+        "Search or add category..."
+      );
+      fireEvent.change(searchInput, { target: { value: "New Category" } });
+
+      await waitFor(() => {
+        expect(screen.getByText(/Add "New Category"/i)).toBeInTheDocument();
+      });
+
+      await fireEvent.click(screen.getByText(/Add "new category"/i));
+
+      await waitFor(() => {
+        const categoryButton = screen.getByRole("combobox");
+        expect(categoryButton).toHaveTextContent(/new category/i);
       });
     });
   });
