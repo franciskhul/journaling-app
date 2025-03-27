@@ -1,12 +1,21 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
+import React from "react";
 
 export default function ChartCard({
   title,
   icon,
+  description,
   children,
 }: {
   title: string;
   icon: React.ReactNode;
+  description?: string | React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
@@ -14,6 +23,11 @@ export default function ChartCard({
       <CardHeader className="flex flex-row items-center space-y-0 pb-2">
         <span className="mr-2">{icon}</span>
         <CardTitle className="font-fugaz text-amber-900">{title}</CardTitle>
+        {description && (
+          <CardDescription className="text-sm text-amber-600">
+            {description}
+          </CardDescription>
+        )}
       </CardHeader>
       <CardContent className="h-64">{children}</CardContent>
     </Card>
