@@ -39,7 +39,7 @@ export default function GetStartedPage() {
         <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-amber-100 to-amber-50 items-center justify-center p-8">
           <div className="text-center">
             <Image
-              src="/journal-illustration.png" // TODO: Replace illustration
+              src="/journal-illustration.webp"
               alt="Happy journaling"
               width={400}
               height={400}
