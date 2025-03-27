@@ -35,7 +35,7 @@ const journalEntrySchema = z.object({
 
 interface NewEditJournalEntryForm {
   editing: boolean;
-  defaultValues?: z.infer<typeof journalEntrySchema>;
+  journalEntry?: z.infer<typeof journalEntrySchema>;
 }
 
 const defaultCategories = [
@@ -46,14 +46,14 @@ const defaultCategories = [
 
 export default function NewEditJournalEntryForm({
   editing,
-  defaultValues,
+  journalEntry,
 }: NewEditJournalEntryForm) {
   const onSubmit = () => {};
   const [categories, setCategories] =
     useState<CategoryType[]>(defaultCategories);
   const form = useForm<z.infer<typeof journalEntrySchema>>({
     resolver: zodResolver(journalEntrySchema),
-    defaultValues: defaultValues || {
+    defaultValues: journalEntry || {
       title: "",
       category: "",
       content: "",
