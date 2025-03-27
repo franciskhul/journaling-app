@@ -102,4 +102,24 @@ describe("RegistrationForm", () => {
       await screen.findByText("Password must be at least 8 characters")
     ).toBeInTheDocument();
   });
+
+  it("validates password match", async () => {
+    render(<RegistrationForm />);
+    const passwordInput = screen.getByLabelText("Password");
+    const confirmInput = screen.getByLabelText("Confirm Password");
+    const submitButton = screen.getByRole("button", {
+      name: /Start Journaling/,
+    });
+
+    await fireEvent.change(passwordInput, { target: { value: "password123" } });
+    await fireEvent.change(confirmInput, {
+      target: { value: "differentpassword" },
+    });
+
+    await fireEvent.click(submitButton);
+
+    expect(
+      await screen.findByText("Passwords don't match")
+    ).toBeInTheDocument();
+  });
 });
