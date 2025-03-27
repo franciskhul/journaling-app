@@ -1,4 +1,3 @@
-// app/journal/[slug]/page.tsx
 import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
