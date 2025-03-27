@@ -1,4 +1,3 @@
-// __tests__/pages/get-started.test.tsx
 import { render, screen } from "@testing-library/react";
 import GetStartedPage from "@/app/(registration)/page";
 
