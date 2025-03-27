@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -27,6 +27,8 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [pending, setPending] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/my-journal";
 
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -47,7 +49,7 @@ export default function LoginForm() {
         form.setError("root", { type: "manual", message: res.error });
       } else {
         toast.success("Welcome back to your journal!");
-        router.push("/my-journal");
+        router.push(callbackUrl);
       }
     } catch (e) {
       console.error(e);
