@@ -102,7 +102,7 @@ export default function NewEditJournalEntryForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel className="font-alumni font-semibold text-lg flex items-center gap-2">
-                <Tag className="h-5 w-5" />
+                <Tag className="h-5 w-5" data-testid="category-tag-icon" />
                 Category
               </FormLabel>
               <FormControl>
