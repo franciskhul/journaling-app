@@ -19,15 +19,15 @@ const chartConfig = {
     label: "Journal Entries",
   },
   travel: {
-    label: "travel",
+    label: "Travel",
     color: "var(--chart-1)",
   },
   personal: {
-    label: "personal",
+    label: "Personal",
     color: "var(--chart-2)",
   },
   work: {
-    label: "work",
+    label: "Work",
     color: "var(--chart-3)",
   },
 } satisfies ChartConfig;
