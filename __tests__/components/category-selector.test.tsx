@@ -76,4 +76,20 @@ describe("CategorySelector", () => {
     expect(screen.getByText(/work/i)).toBeInTheDocument();
     expect(screen.getByText(/Travel/i)).toBeInTheDocument();
   });
+
+  it("calls onChange when selecting a category", async () => {
+    render(
+      <CategorySelector
+        selectedCategoryValue=""
+        categories={mockCategories}
+        addCategoryAction={mockAddCategory}
+        onChangeAction={mockOnChange}
+      />
+    );
+
+    await fireEvent.click(screen.getByRole("combobox"));
+    await fireEvent.click(screen.getByText("Personal"));
+
+    expect(mockOnChange).toHaveBeenCalledWith("personal");
+  });
 });
