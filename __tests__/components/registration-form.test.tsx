@@ -325,5 +325,39 @@ describe("RegistrationForm", () => {
       });
       expect(mockRouter.push).not.toHaveBeenCalled();
     });
+
+    it("handles 409 conflict error", async () => {
+      // Mock 409 response
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 409,
+        json: () => Promise.resolve({ error: "Email already registered" }),
+      });
+
+      render(<RegistrationForm />);
+
+      // Fill out the form
+      fireEvent.change(screen.getByLabelText("Full Name"), {
+        target: { value: "Existing User" },
+      });
+      fireEvent.change(screen.getByLabelText("Email"), {
+        target: { value: "exists@example.com" },
+      });
+      fireEvent.change(screen.getByLabelText("Password"), {
+        target: { value: "ValidPass123!" },
+      });
+      fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        target: { value: "ValidPass123!" },
+      });
+
+      // Submit the form
+      fireEvent.click(screen.getByRole("button", { name: /Start Journaling/ }));
+
+      // Verify error handling
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Email already registered");
+      });
+      expect(signIn).not.toHaveBeenCalled();
+    });
   });
 });

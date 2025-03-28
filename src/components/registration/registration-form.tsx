@@ -113,7 +113,6 @@ export default function RegistrationForm() {
       router.refresh();
       router.push("/my-journal");
     } catch (error) {
-      console.error("Registration error:", error);
       toast.error(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
