@@ -36,12 +36,8 @@ function transformCategory(
   category: Category & { UserCategory: { userId: string }[] }
 ): CategoryWithUserFlag {
   return {
-    id: category.id,
-    label: category.name, // Mapping 'name' to 'label'
-    systemGenerated: category.systemGenerated,
-    isUserCategory: category.UserCategory.length > 0,
-    createdAt: category.createdAt,
-    updatedAt: category.updatedAt,
+    value: category.id,
+    label: category.name,
   };
 }
 

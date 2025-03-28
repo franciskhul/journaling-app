@@ -12,10 +12,6 @@ export type UserCategory = {
 };
 
 export type CategoryWithUserFlag = {
-  id: string;
+  value: string;
   label: string;
-  systemGenerated: boolean;
-  isUserCategory: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 };

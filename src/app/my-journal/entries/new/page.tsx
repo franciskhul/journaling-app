@@ -1,9 +1,20 @@
 import { Button } from "@/components/ui/button";
 import NewEditJournalEntryForm from "@/components/my-journal/new-edit-journal-entry-form";
-
 import { Plus } from "lucide-react";
+import { getServerSession } from "next-auth";
+import authOptions from "@/lib/next-auth/authOptions";
+import { getUserAndSystemCategories } from "@/services/category/getUserAndSystemCategories";
 
-export default function NewJournalEntryPage() {
+export default async function NewJournalEntryPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    // Handle unauthorized case
+    return <div>Unauthorized</div>;
+  }
+
+  const categories = await getUserAndSystemCategories(session.user.id);
+
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
@@ -15,7 +26,7 @@ export default function NewJournalEntryPage() {
           Create Entry
         </Button>
       </div>
-      <NewEditJournalEntryForm editing={false} />
+      <NewEditJournalEntryForm editing={false} categories={categories} />
     </div>
   );
 }
