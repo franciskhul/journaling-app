@@ -22,6 +22,15 @@ export type RegistrationSuccess = {
   expires: string;
 };
 
+export type CategoryWithUserFlag = {
+  id: string;
+  name: string;
+  systemGenerated: boolean;
+  isUserCategory: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type JournalEntrySuccess = {
   id: string;
   title: string;
