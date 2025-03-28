@@ -6,6 +6,7 @@ import { refreshAccessToken, saveRefreshToken } from "@/lib/auth-db";
 import { AUTH_CONFIG } from "@/lib/config/auth";
 import { db } from "@/lib/db";
 import NextAuth from "next-auth";
+import { checkDenylist } from "@/lib/auth-db";
 
 declare module "next-auth" {
   interface Session {
@@ -41,21 +42,27 @@ const authOptions: AuthOptions = {
     maxAge: AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
   },
   callbacks: {
-    async jwt({ token, user }) {
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      // Initial login
-      if (user) {
+    async jwt({ token, user, trigger }) {
+      // Initial sign in
+      if (trigger === "signIn" && user) {
         return {
           ...token,
           accessToken: generateAccessToken(user),
           refreshToken: await saveRefreshToken(user.id),
-          exp: currentTime + AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
+          exp:
+            Math.floor(Date.now() / 1000) + AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
           role: user.role,
         };
       }
 
-      // Token refresh
+      if (token.accessToken && typeof token.accessToken === "string") {
+        const isRevoked = await checkDenylist(token.accessToken);
+        if (isRevoked) {
+          throw new Error("Token revoked");
+        }
+      }
+
+      const currentTime = Math.floor(Date.now() / 1000);
       if (currentTime > (token.exp as number)) {
         try {
           if (typeof token.refreshToken !== "string") {
@@ -74,7 +81,6 @@ const authOptions: AuthOptions = {
           };
         } catch (error) {
           console.error("Refresh token error:", error);
-          // Signal frontend to force reauthentication
           return { ...token, error: "REAUTHENTICATE" };
         }
       }
