@@ -22,6 +22,55 @@ export type RegistrationSuccess = {
   expires: string;
 };
 
+export type JournalEntrySuccess = {
+  id: string;
+  title: string;
+  content: string;
+  userId: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type JournalEntryValidationError = {
+  error: string;
+  details: Record<string, string[]>;
+};
+
+export type JournalEntryConflictError = {
+  error: string;
+  message: string;
+  code: "409";
+};
+
+// Type Guards
+
+export function isJournalEntryValidationError(
+  response: unknown
+): response is JournalEntryValidationError {
+  return (
+    typeof response === "object" &&
+    response !== null &&
+    "error" in response &&
+    "details" in response
+  );
+}
+
+export function isJournalEntryConflictError(
+  response: unknown
+): response is JournalEntryConflictError {
+  return (
+    typeof response === "object" &&
+    response !== null &&
+    "error" in response &&
+    "code" in response &&
+    response.code === "409"
+  );
+}
+
 export type RegistrationError = {
   error: string;
   details: Record<string, string[]>;
