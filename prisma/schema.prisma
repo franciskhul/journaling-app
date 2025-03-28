@@ -63,15 +63,15 @@ model JWT_Denylist {
 }
 
 model JournalEntry {
-  id              String            @id @default(uuid()) @db.Uuid
-  userId          String            @db.Uuid
+  id              String                 @id @default(uuid()) @db.Uuid
+  userId          String                 @db.Uuid
   title           String
-  content         String            @db.Text
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  user            User              @relation(fields: [userId], references: [id])
-  categories      Category[]        @relation("JournalCategories")
-  JournalCategory JournalCategory[]
+  content         String                 @db.Text
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  user            User                   @relation(fields: [userId], references: [id])
+  categories      Category[]             @relation("JournalCategories")
+  JournalCategory JournalEntryCategory[]
 
   @@index([userId])
   @@index([title])
@@ -84,17 +84,17 @@ model Category {
   color           String
   systemGenerated Boolean @default(false)
 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  journals        JournalEntry[]    @relation("JournalCategories")
-  JournalCategory JournalCategory[]
-  users           User[]            @relation("UserCategories")
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  journals        JournalEntry[]         @relation("JournalCategories")
+  JournalCategory JournalEntryCategory[]
+  users           User[]                 @relation("UserCategories")
   UserCategory    UserCategory[]
 
   @@index([createdAt])
 }
 
-model JournalCategory {
+model JournalEntryCategory {
   journalId  String @db.Uuid
   categoryId String @db.Uuid
 
