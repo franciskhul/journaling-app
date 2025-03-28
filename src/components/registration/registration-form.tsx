@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
-import { UserPlus, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { signIn } from "next-auth/react";
 import * as z from "zod";
 import { toast } from "sonner";
 import {
@@ -15,6 +17,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  ApiResponse,
+  isRegistrationError,
+  RegistrationSuccess,
+} from "@/types/api";
 
 const formSchema = z
   .object({
@@ -37,6 +44,8 @@ const formSchema = z
 export default function RegistrationForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [pending, setPending] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,17 +58,76 @@ export default function RegistrationForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setPending(true);
+    form.clearErrors();
+
     try {
-      console.log(values);
-      toast.success("Welcome to your new journal!");
+      const response = await fetch("/api/auth/registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: values.name,
+          email: values.email,
+          password: values.password,
+        }),
+      });
+
+      const data: ApiResponse<RegistrationSuccess> = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 400 && isRegistrationError(data)) {
+          // Handle validation errors
+          Object.entries(data.details).forEach(([field, messages]) => {
+            form.setError(field as keyof z.infer<typeof formSchema>, {
+              type: "manual",
+              message: messages.join(", "),
+            });
+          });
+          toast.error("Please fix the form errors");
+          return;
+        } else if (response.status === 409) {
+          form.setError("root", {
+            type: "manual",
+            message: data.error,
+          });
+          toast.error(data.error);
+          return;
+        } else {
+          throw new Error(data.error || "Registration failed");
+        }
+      }
+
+      const signInResponse = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (signInResponse?.error) {
+        throw new Error(signInResponse.error);
+      }
+
+      // Handle success
+      toast.success("Account created and logged in successfully!");
+      router.refresh();
+      router.push("/my-journal");
     } catch (error) {
-      console.error(error);
-      toast.error("An error occurred");
+      console.error("Registration error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "An unexpected error occurred"
+      );
+    } finally {
+      setPending(false);
     }
   };
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+        {form.formState.errors.root && (
+          <p className="font-alumni text-sm text-red-500 text-center">
+            {form.formState.errors.root.message}
+          </p>
+        )}
         <div className="space-y-4">
           {/* Full Name Field */}
           <FormField
@@ -117,7 +185,6 @@ export default function RegistrationForm() {
                   <FormControl>
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
                       {...field}
                       className="font-alumni py-6 border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
                     />
@@ -155,7 +222,6 @@ export default function RegistrationForm() {
                   <FormControl>
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="••••••••"
                       {...field}
                       className="font-alumni py-6 border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-100"
                     />
@@ -184,8 +250,17 @@ export default function RegistrationForm() {
             type="submit"
             className="w-full py-6 font-fugaz text-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 shadow-md hover:shadow-lg transition-all"
           >
-            <UserPlus className="mr-2 h-5 w-5" />
-            Start Journaling
+            {pending ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Start Journaling....
+              </>
+            ) : (
+              <>
+                <UserPlus className="mr-2 h-5 w-5" />
+                Start Journaling
+              </>
+            )}
           </Button>
         </div>
       </form>
