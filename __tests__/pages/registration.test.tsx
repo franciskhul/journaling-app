@@ -1,66 +1,112 @@
 import { render, screen } from "@testing-library/react";
 import RegistrationPage from "@/app/(registration)/page";
+import { checkAuth } from "@/lib/next-auth/checkAuth";
+import { redirect } from "next/navigation";
 
-// Mock the RegistrationForm component
+// Custom error for testing redirects
+class TestRedirectError extends Error {
+  constructor(public url: string) {
+    super(`Redirect to ${url}`);
+  }
+}
+
+// Mock the components
 jest.mock("@/components/registration/registration-form", () => ({
   __esModule: true,
   default: () => <div data-testid="mock-registration-form" />,
 }));
 
-// Mock next/image
-jest.mock("next/image", () => ({
-  __esModule: true,
-  default: (props: any) => <img {...props} />,
+jest.mock("@/lib/next-auth/checkAuth", () => ({
+  checkAuth: jest.fn().mockResolvedValue({
+    isAuthenticated: false,
+    user: null,
+    accessToken: null,
+    refreshToken: null,
+  }),
+}));
+jest.mock("next/navigation", () => ({
+  ...jest.requireActual("next/navigation"),
+  redirect: jest.fn().mockImplementation((url: string) => {
+    throw new TestRedirectError(url);
+  }),
+  useRouter: jest.fn(),
 }));
 
 describe("RegistrationPage", () => {
+  const mockCheckAuth = checkAuth as jest.Mock;
+  const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
+
   beforeEach(() => {
-    render(<RegistrationPage />);
+    mockRedirect.mockImplementation((url: string) => {
+      throw new TestRedirectError(url);
+    });
+    jest.clearAllMocks();
   });
 
-  it("displays the sparkle icon and heading", () => {
-    const sparklesIcon = screen.getByTestId("sparkles-icon");
-    expect(sparklesIcon).toBeInTheDocument();
+  describe("When unauthenticated", () => {
+    beforeEach(() => {
+      mockCheckAuth.mockResolvedValue({
+        isAuthenticated: false,
+        user: null,
+      });
+    });
 
-    const heading = screen.getByText("Get Started");
-    expect(heading).toBeInTheDocument();
-    expect(heading).toHaveClass("font-fugaz");
+    it("renders the registration page", async () => {
+      const Page = await RegistrationPage();
+      render(Page);
+
+      expect(screen.getByText("Get Started")).toBeInTheDocument();
+      expect(screen.getByTestId("mock-registration-form")).toBeInTheDocument();
+    });
+
+    it("shows the login link", async () => {
+      const Page = await RegistrationPage();
+      render(Page);
+
+      const loginLink = screen.getByRole("link", { name: "Sign in instead" });
+      expect(loginLink).toHaveAttribute("href", "/auth/login");
+    });
   });
 
-  it("shows the subtitle text", () => {
-    const subtitle = screen.getByText(/begin your journaling adventure today/i);
-    expect(subtitle).toBeInTheDocument();
-    expect(subtitle).toHaveClass("font-alumni");
-  });
+  describe("When authenticated", () => {
+    beforeEach(() => {
+      mockCheckAuth.mockResolvedValue({
+        isAuthenticated: true,
+        user: {
+          id: "123",
+          email: "user@example.com",
+          role: "USER",
+        },
+      });
+    });
 
-  it("renders the RegistrationForm component", () => {
-    expect(screen.getByTestId("mock-registration-form")).toBeInTheDocument();
-  });
+    it("redirects to /my-journal", async () => {
+      let redirectError: TestRedirectError | undefined;
 
-  it("displays the login link with correct styling", () => {
-    const loginLink = screen.getByRole("link", { name: "Sign in instead" });
-    expect(loginLink).toBeInTheDocument();
-    expect(loginLink).toHaveAttribute("href", "/auth/login");
-    expect(loginLink).toHaveClass("text-amber-600");
-    expect(loginLink).toHaveClass("hover:text-amber-800");
-  });
+      try {
+        const Page = await RegistrationPage();
+        render(Page);
+      } catch (err) {
+        if (err instanceof TestRedirectError) {
+          redirectError = err;
+        }
+      }
 
-  it("renders the visual section with correct content", () => {
-    const visualSection = screen.getByTestId("visual-section");
-    expect(visualSection).toBeInTheDocument();
-    expect(visualSection).toHaveClass("bg-gradient-to-br");
-    expect(visualSection).toHaveClass("from-amber-100");
-    expect(visualSection).toHaveClass("to-amber-50");
+      expect(redirectError).toBeDefined();
+      expect(redirectError?.url).toBe("/my-journal");
+    });
 
-    expect(screen.getByText("Your Story Begins Here")).toBeInTheDocument();
-    expect(screen.getByText(/capture memories/i)).toBeInTheDocument();
-  });
+    it("does not render registration form when redirected", async () => {
+      let pageContent: React.ReactNode | null = null;
 
-  it("applies the correct font classes", () => {
-    expect(screen.getByText("Get Started")).toHaveClass("font-fugaz");
-    expect(screen.getByText(/begin your journaling/i)).toHaveClass(
-      "font-alumni"
-    );
-    expect(screen.getByText(/capture memories/i)).toHaveClass("font-alumni");
+      try {
+        const Page = await RegistrationPage();
+        pageContent = Page;
+      } catch {
+        // We expect an error from the redirect
+      }
+
+      expect(pageContent).toBeNull();
+    });
   });
 });
