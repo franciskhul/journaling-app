@@ -11,13 +11,13 @@ export async function getJournalEntriesByMonth(
 ): Promise<JournalEntriesResponse> {
   try {
     // Validate month input
-    if (month < 1 || month > 12) {
-      throw new Error("Month must be between 1 and 12");
+    if (month < 0 || month > 11) {
+      throw new Error("Month must be between 0 and 11");
     }
 
     // Create date range
-    const startDate = new Date(year, month - 1, 1, 0, 0, 0, 0);
-    const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+    const startDate = new Date(year, month, 1, 0, 0, 0, 0);
+    const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
     const [entries, totalCount] = await Promise.all([
       db.journalEntry.findMany({

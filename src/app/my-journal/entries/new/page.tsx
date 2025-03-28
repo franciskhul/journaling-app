@@ -4,13 +4,15 @@ import { Plus } from "lucide-react";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/next-auth/authOptions";
 import { getUserAndSystemCategories } from "@/services/category/getUserAndSystemCategories";
+import { redirect } from "next/navigation";
 
 export default async function NewJournalEntryPage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    // Handle unauthorized case
-    return <div>Unauthorized</div>;
+    redirect(
+      "/auth/login?callbackUrl=" + encodeURIComponent(window.location.pathname)
+    );
   }
 
   const categories = await getUserAndSystemCategories(session.user.id);

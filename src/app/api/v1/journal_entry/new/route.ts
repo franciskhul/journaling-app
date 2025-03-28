@@ -164,7 +164,7 @@ export async function POST(req: Request) {
         const category = await findOrCreateCategory(
           session.user.id,
           categoryId,
-          tx // Make sure this function accepts the tx parameter
+          tx
         );
 
         // 2. Create journal entry
@@ -175,7 +175,7 @@ export async function POST(req: Request) {
             userId: session.user.id,
             categoryId: category.id,
           },
-          tx // Make sure this function accepts the tx parameter
+          tx
         );
 
         return journalEntry;

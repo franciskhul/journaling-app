@@ -26,6 +26,8 @@ import {
   ApiResponse,
   JournalEntrySuccess,
 } from "@/types/api";
+import { JournalEntryInput } from "@/lib/validations/journalEntry";
+import { editJournalEntry } from "@/services/journalEntry/editJournalEntry";
 
 // Define validation schema
 const journalEntrySchema = z.object({
@@ -33,7 +35,7 @@ const journalEntrySchema = z.object({
     .string()
     .min(1, "Title is required")
     .max(200, "Title must be less than 200 characters"),
-  category: z.string().min(1, "Please select a category"),
+  categoryId: z.string().min(1, "Please select a category"),
   content: z
     .string()
     .min(4, "Content must be at least 4 characters")
@@ -45,6 +47,7 @@ export type JournalEntryFormValues = z.infer<typeof journalEntrySchema>;
 interface NewEditJournalEntryForm {
   editing: boolean;
   journalEntry?: z.infer<typeof journalEntrySchema>;
+  journalEntryId?: string;
   onSuccess?: () => void;
   categories: CategoryWithUserFlag[];
 }
@@ -53,15 +56,19 @@ export default function NewEditJournalEntryForm({
   editing,
   journalEntry,
   onSuccess,
+  journalEntryId,
   categories: defaultCategories,
 }: NewEditJournalEntryForm) {
   const [pending, setPending] = useState(false);
   const router = useRouter();
 
-  const onSubmitAction = async (values: JournalEntryFormValues) => {
+  const onSubmitAction = async (values: JournalEntryInput) => {
     setPending(true);
     try {
-      const response = await saveJournalEntry(values);
+      const response =
+        editing && journalEntryId
+          ? await editJournalEntry(values, journalEntryId)
+          : await saveJournalEntry(values);
       console.log(response);
 
       // error
@@ -82,7 +89,7 @@ export default function NewEditJournalEntryForm({
 
         // Handle conflict errors (409)
         if (response.status === 409 && isJournalEntryConflictError(data)) {
-          form.setError("category", {
+          form.setError("categoryId", {
             type: "manual",
             message: data.error,
           });
@@ -103,10 +110,10 @@ export default function NewEditJournalEntryForm({
       if (onSuccess) {
         onSuccess();
       } else {
-        router.refresh();
-        router.push("/my-journal");
+        router.push("/my-journal"); // TODO: navigate to the single journal entry
       }
     } catch (error) {
+      console.log(error);
       toast.error(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
@@ -121,7 +128,7 @@ export default function NewEditJournalEntryForm({
     resolver: zodResolver(journalEntrySchema),
     defaultValues: journalEntry || {
       title: "",
-      category: "",
+      categoryId: "",
       content: "",
     },
   });
@@ -164,7 +171,7 @@ export default function NewEditJournalEntryForm({
         {/* Category Selector */}
         <FormField
           control={form.control}
-          name="category"
+          name="categoryId"
           render={({ field }) => (
             <FormItem>
               <FormLabel
@@ -221,6 +228,7 @@ export default function NewEditJournalEntryForm({
           {pending ? (
             <Button
               type="submit"
+              disabled={pending}
               className="font-alumni font-bold bg-gradient-to-r from-blue-600 to-indigo-600"
             >
               {editing ? (
@@ -230,7 +238,7 @@ export default function NewEditJournalEntryForm({
                 </>
               ) : (
                 <>
-                  <Plus className="mr-2 h-4 w-4" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Creating Entry...
                 </>
               )}

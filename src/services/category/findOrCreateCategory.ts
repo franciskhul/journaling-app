@@ -19,7 +19,7 @@ export default async function findOrCreateCategory(
       const existingCategory = await tx.category.findUnique({
         where: { id: categoryInput },
       });
-      if (existingCategory) return existingCategory;
+      if (existingCategory) return existingCategory; // TODO: add the linking this category to the user if not linked
     }
 
     // Create new category using the transaction client

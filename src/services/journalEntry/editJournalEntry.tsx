@@ -1,10 +1,11 @@
 import { JournalEntryInput } from "@/lib/validations/journalEntry";
 
-export const saveJournalEntry = async (
-  values: JournalEntryInput
+export const editJournalEntry = async (
+  values: JournalEntryInput,
+  journalEntryId: string
 ): Promise<Response> => {
-  return fetch("/api/v1/journal_entry/new", {
-    method: "POST",
+  return fetch(`/api/v1/journal_entries/${journalEntryId}/edit`, {
+    method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       title: values.title,

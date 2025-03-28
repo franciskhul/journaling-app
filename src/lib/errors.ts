@@ -36,3 +36,17 @@ export class ConflictError extends HttpError {
     super(message, 409);
   }
 }
+
+export class NotFoundError extends HttpError {
+  constructor(message = "Resource not found") {
+    super(message, 404);
+  }
+}
+
+export class ForbiddenError extends HttpError {
+  constructor(
+    message = "Forbidden: You don't have permission to access this resource"
+  ) {
+    super(message, 403);
+  }
+}

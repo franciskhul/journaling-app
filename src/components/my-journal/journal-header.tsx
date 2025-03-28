@@ -83,7 +83,7 @@ export function JournalHeader() {
             className="hover:bg-amber-100 text-amber-900 font-medium pl-3"
           >
             <CalendarIcon className="mr-2 h-4 w-4 text-amber-600" />
-            {format(new Date(year, month - 1, 1), "MMM yyyy")}
+            {format(new Date(year, month, 1), "MMM yyyy")}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 bg-white space-y-2">
