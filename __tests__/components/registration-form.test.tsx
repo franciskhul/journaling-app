@@ -282,4 +282,48 @@ describe("RegistrationForm", () => {
       expect(mockRouter.push).toHaveBeenCalledWith("/my-journal");
     });
   });
+
+  describe("Error Handling", () => {
+    it("handles sign-in error after successful registration", async () => {
+      // Mock successful registration
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            user: { id: "1", email: "test@example.com", role: "USER" },
+            accessToken: "mock-token",
+          }),
+      });
+
+      // Mock failed sign-in
+      (signIn as jest.Mock).mockImplementationOnce(() =>
+        Promise.resolve({ error: "Login failed" })
+      );
+
+      render(<RegistrationForm />);
+
+      // Fill out the form
+      fireEvent.change(screen.getByLabelText("Full Name"), {
+        target: { value: "Test User" },
+      });
+      fireEvent.change(screen.getByLabelText("Email"), {
+        target: { value: "test@example.com" },
+      });
+      fireEvent.change(screen.getByLabelText("Password"), {
+        target: { value: "ValidPass123!" },
+      });
+      fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        target: { value: "ValidPass123!" },
+      });
+
+      // Submit the form
+      fireEvent.click(screen.getByRole("button", { name: /Start Journaling/ }));
+
+      // Verify error handling
+      await waitFor(() => {
+        expect(toast.error).toHaveBeenCalledWith("Login failed");
+      });
+      expect(mockRouter.push).not.toHaveBeenCalled();
+    });
+  });
 });
