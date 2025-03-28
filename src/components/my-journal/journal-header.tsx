@@ -6,7 +6,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar as CalendarIcon, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Plus, Calendar as CalendarIcon, LogOut, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -28,8 +30,34 @@ export function JournalHeader() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
+  const [pending, setPending] = useState(false);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    setPending(true);
+    try {
+      // Call our custom logout API
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        // Client-side sign out
+        await signOut({ redirect: false });
+        router.push("/auth/login");
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    setPending(false);
+  };
   return (
-    <header className="sticky top-0 z-10 flex h-12 items-center gap-4 px-4 sm:px-6  bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 justify-between">
+    <header
+      className="sticky top-0 z-10 flex 
+    h-12 items-center gap-4 px-4 sm:px-6  bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 justify-between"
+    >
       <SidebarTrigger className="[existing classes] bg-orange-100 hover:bg-orange-200 -ml-2" />
       {/* Month/Year Picker */}
       <Popover>
@@ -105,8 +133,15 @@ export function JournalHeader() {
                 variant="outline"
                 size="icon"
                 className="hover:bg-red-300 text-red-600 font-medium pl-3"
+                onClick={handleLogout}
               >
-                <LogOut className="h-3.5 w-3.5" />
+                {pending ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  </>
+                ) : (
+                  <LogOut className="h-3.5 w-3.5" />
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
