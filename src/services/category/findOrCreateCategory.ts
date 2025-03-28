@@ -25,7 +25,7 @@ export default async function findOrCreateCategory(
     // Create new category using the transaction client
     return await tx.category.create({
       data: {
-        name: categoryInput,
+        name: transformToTitleCase(categoryInput),
         systemGenerated: false,
         UserCategory: {
           create: { userId },
@@ -46,4 +46,12 @@ export default async function findOrCreateCategory(
     console.error("[CATEGORY_SERVICE_ERROR]", error);
     throw error;
   }
+}
+
+function transformToTitleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
