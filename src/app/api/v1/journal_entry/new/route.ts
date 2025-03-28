@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/next-auth/authOptions";
 import { ValidationError, ConflictError } from "@/lib/errors";
@@ -157,28 +158,37 @@ export async function POST(req: Request) {
     const { title, content, categoryId } = validation.data;
 
     // Transaction wrapper
-    const result = await db.$transaction(async (tx) => {
-      try {
+    const result = await db
+      .$transaction(async (tx) => {
         // 1. Find or create category
         const category = await findOrCreateCategory(
           session.user.id,
-          categoryId
+          categoryId,
+          tx // Make sure this function accepts the tx parameter
         );
 
-        return await createJournalEntry(
-          { title, content, userId: session.user.id, categoryId: category.id },
-          tx
+        // 2. Create journal entry
+        const journalEntry = await createJournalEntry(
+          {
+            title,
+            content,
+            userId: session.user.id,
+            categoryId: category.id,
+          },
+          tx // Make sure this function accepts the tx parameter
         );
-      } catch (error) {
+
+        return journalEntry;
+      })
+      .catch((error) => {
         if (
-          error instanceof Error &&
-          error.message.includes("Unique constraint failed")
+          error instanceof PrismaClientKnownRequestError &&
+          error.code === "P2002"
         ) {
           throw new ConflictError("Category already exists");
         }
         throw error;
-      }
-    });
+      });
 
     return NextResponse.json(
       {
