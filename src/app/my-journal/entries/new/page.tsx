@@ -1,4 +1,3 @@
-// app/journal/new/page.tsx
 import { Button } from "@/components/ui/button";
 import NewEditJournalEntryForm from "@/components/my-journal/new-edit-journal-entry-form";
 

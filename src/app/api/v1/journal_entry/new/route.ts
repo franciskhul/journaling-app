@@ -162,11 +162,9 @@ export async function POST(req: Request) {
         // 1. Find or create category
         const category = await findOrCreateCategory(
           session.user.id,
-          categoryId,
-          tx
+          categoryId
         );
 
-        // 2. Create journal entry with category association
         return await createJournalEntry(
           { title, content, userId: session.user.id, categoryId: category.id },
           tx
