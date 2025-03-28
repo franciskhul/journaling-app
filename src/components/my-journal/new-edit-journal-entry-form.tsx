@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { type CategoryWithUserFlag } from "@/types/category";
 import * as z from "zod";
 import {
   Form,
@@ -14,10 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  CategorySelector,
-  CategoryType,
-} from "@/components/my-journal/category-selector";
+import { CategorySelector } from "@/components/my-journal/category-selector";
 import { Button } from "@/components/ui/button";
 import { Plus, Tag, Edit, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -48,18 +46,14 @@ interface NewEditJournalEntryForm {
   editing: boolean;
   journalEntry?: z.infer<typeof journalEntrySchema>;
   onSuccess?: () => void;
+  categories: CategoryWithUserFlag[];
 }
-
-const defaultCategories = [
-  { value: "6d6491af-c8bc-4b81-ab1c-7d9bbce8605f", label: "Personal" },
-  { value: "0b817598-7848-47f6-83fd-2af5de3b7b47", label: "Work" },
-  { value: "00e44d6d-c10b-49b8-8bbc-20ca81bb8cc2", label: "Travel" },
-];
 
 export default function NewEditJournalEntryForm({
   editing,
   journalEntry,
   onSuccess,
+  categories: defaultCategories,
 }: NewEditJournalEntryForm) {
   const [pending, setPending] = useState(false);
   const router = useRouter();
@@ -122,7 +116,7 @@ export default function NewEditJournalEntryForm({
   };
 
   const [categories, setCategories] =
-    useState<CategoryType[]>(defaultCategories);
+    useState<CategoryWithUserFlag[]>(defaultCategories);
   const form = useForm<z.infer<typeof journalEntrySchema>>({
     resolver: zodResolver(journalEntrySchema),
     defaultValues: journalEntry || {
