@@ -34,7 +34,7 @@ import { GET, POST } from "@/auth";
  *         example: "the-generated-csrf-token"
  *     responses:
  *       302:
- *         description: >
+ *         description:
  *           Successful authentication results in a redirect (HTTP 302) to the callback URL (or default route)
  *           and sets the authentication cookies.
  *       401:

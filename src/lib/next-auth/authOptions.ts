@@ -5,6 +5,7 @@ import { verifyPassword } from "@/lib/auth";
 import { refreshAccessToken, saveRefreshToken } from "@/lib/auth-db";
 import { AUTH_CONFIG } from "@/lib/config/auth";
 import { db } from "@/lib/db";
+import NextAuth from "next-auth";
 
 declare module "next-auth" {
   interface Session {
@@ -140,3 +141,7 @@ const authOptions: AuthOptions = {
 };
 
 export default authOptions;
+
+export const auth = async () => {
+  return NextAuth(authOptions);
+};
