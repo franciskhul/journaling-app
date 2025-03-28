@@ -1,18 +1,20 @@
 import { db } from "@/lib/db";
-import type { TransactionClient } from "@/lib/types/prisma";
-import { PrismaClient } from "@prisma/client";
 
 export default async function findOrCreateCategory(
   userId: string,
-  categoryInput: string,
-  tx: TransactionClient | PrismaClient = db
+  categoryInput: string
 ) {
   try {
-    const existingCategory = await tx.category.findUnique({
-      where: { id: categoryInput },
-    });
-
-    if (existingCategory) return existingCategory;
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        categoryInput
+      );
+    if (isUuid) {
+      const existingCategory = await db.category.findUnique({
+        where: { id: categoryInput },
+      });
+      if (existingCategory) return existingCategory;
+    }
 
     return await db.category.create({
       data: {
