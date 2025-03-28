@@ -6,10 +6,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Plus, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Calendar as CalendarIcon, LogOut } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -91,9 +97,26 @@ export function JournalHeader() {
         </PopoverContent>
       </Popover>
 
-      <Link
-        href="/my-journal/entries/new"
-        className="
+      <div className="flex items-center  gap-4">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="hover:bg-red-300 text-red-600 font-medium pl-3"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Logout</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        <Link
+          href="/my-journal/entries/new"
+          className="
           flex items-center gap-2
           px-4 py-2 rounded-lg
           bg-amber-600 hover:bg-amber-700
@@ -101,10 +124,11 @@ export function JournalHeader() {
           shadow-sm hover:shadow-md
           transition-all
         "
-      >
-        <Plus className="h-4 w-4" />
-        <span className="font-medium">New Entry</span>
-      </Link>
+        >
+          <Plus className="h-4 w-4" />
+          <span className="font-medium">New Entry</span>
+        </Link>
+      </div>
     </header>
   );
 }
