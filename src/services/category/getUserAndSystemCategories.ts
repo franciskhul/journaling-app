@@ -1,6 +1,7 @@
+// services/category/getUserAndSystemCategories.ts
 import { db } from "@/lib/db";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { Category, CategoryWithUserFlag } from "@/types/category";
+import type { Category, CategoryWithUserFlag } from "@/types/category";
 
 export async function getUserAndSystemCategories(
   userId: string
@@ -10,31 +11,19 @@ export async function getUserAndSystemCategories(
       where: {
         OR: [
           {
-            UserCategory: {
-              some: {
-                userId: userId,
-              },
-            },
+            UserCategory: { some: { userId } },
             systemGenerated: false,
           },
-          {
-            systemGenerated: true,
-          },
+          { systemGenerated: true },
         ],
       },
       include: {
         UserCategory: {
-          where: {
-            userId: userId,
-          },
-          select: {
-            userId: true,
-          },
+          where: { userId },
+          select: { userId: true },
         },
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
     });
 
     return categories.map(transformCategory);
@@ -48,7 +37,7 @@ function transformCategory(
 ): CategoryWithUserFlag {
   return {
     id: category.id,
-    name: category.name,
+    label: category.name, // Mapping 'name' to 'label'
     systemGenerated: category.systemGenerated,
     isUserCategory: category.UserCategory.length > 0,
     createdAt: category.createdAt,
@@ -59,8 +48,8 @@ function transformCategory(
 function handleCategoryError(error: unknown): never {
   if (error instanceof PrismaClientKnownRequestError) {
     console.error("[CATEGORY_SERVICE_ERROR]", error);
-    throw new Error("Failed to fetch categories due to database error");
+    throw new Error("Failed to fetch categories");
   }
   console.error("[UNKNOWN_ERROR]", error);
-  throw new Error("Failed to fetch categories");
+  throw new Error("Internal server error");
 }

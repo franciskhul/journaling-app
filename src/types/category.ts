@@ -11,6 +11,11 @@ export type UserCategory = {
   categoryId: string;
 };
 
-export type CategoryWithUserFlag = Category & {
+export type CategoryWithUserFlag = {
+  id: string;
+  label: string;
+  systemGenerated: boolean;
   isUserCategory: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 };
