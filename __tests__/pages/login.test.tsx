@@ -39,6 +39,6 @@ describe("LoginPage", () => {
     expect(screen.getByText(/new to journal joy\?/i)).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Create an account" })
-    ).toHaveAttribute("href", "/auth/register");
+    ).toHaveAttribute("href", "/");
   });
 });

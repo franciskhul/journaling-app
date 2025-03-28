@@ -28,7 +28,7 @@ export default function LoginPage() {
           <p className="font-alumni text-neutral-600">
             New to Journal Joy?{" "}
             <Link
-              href="/auth/register"
+              href="/"
               className="font-semibold text-amber-600 hover:text-amber-800 underline"
             >
               Create an account
