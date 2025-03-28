@@ -1,9 +1,9 @@
 // __tests__/components/RegistrationForm.test.tsx
-import { render, screen, fireEvent /*waitFor*/ } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import RegistrationForm from "@/components/registration/registration-form";
-// import { signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-// import { toast } from "sonner";
+import { toast } from "sonner";
 // import { z } from "zod";
 
 jest.mock("sonner", () => ({
@@ -217,6 +217,69 @@ describe("RegistrationForm", () => {
       expect(
         await screen.findByText("Passwords don't match")
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("Successful Registration Flow", () => {
+    it("submits the form and signs in the user", async () => {
+      // Mock successful registration response
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            user: { id: "1", email: "test@example.com", role: "USER" },
+            accessToken: "mock-token",
+          }),
+      });
+
+      render(<RegistrationForm />);
+
+      // Fill out the form using fireEvent
+      fireEvent.change(screen.getByLabelText("Full Name"), {
+        target: { value: "Test User" },
+      });
+      fireEvent.change(screen.getByLabelText("Email"), {
+        target: { value: "test@example.com" },
+      });
+      fireEvent.change(screen.getByLabelText("Password"), {
+        target: { value: "ValidPass123!" },
+      });
+      fireEvent.change(screen.getByLabelText("Confirm Password"), {
+        target: { value: "ValidPass123!" },
+      });
+
+      // Submit the form
+      fireEvent.click(screen.getByRole("button", { name: /Start Journaling/ }));
+
+      // Verify API call
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith("/api/auth/registration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            name: "Test User",
+            email: "test@example.com",
+            password: "ValidPass123!",
+          }),
+        });
+      });
+
+      // Verify sign-in attempt
+      await waitFor(() => {
+        expect(signIn).toHaveBeenCalledWith("credentials", {
+          email: "test@example.com",
+          password: "ValidPass123!",
+          redirect: false,
+        });
+      });
+
+      // Verify success flow
+      expect(toast.success).toHaveBeenCalledWith(
+        "Account created and logged in successfully!"
+      );
+      expect(mockRouter.refresh).toHaveBeenCalled();
+      expect(mockRouter.push).toHaveBeenCalledWith("/my-journal");
     });
   });
 });
