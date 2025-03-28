@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginForm from "@/components/login/login-form";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 jest.mock("next-auth/react");
 jest.mock("sonner");
@@ -9,9 +9,17 @@ jest.mock("next/navigation");
 
 const mockSignIn = signIn as jest.Mock;
 const mockPush = jest.fn();
+const mockGet = jest.fn();
 
 (useRouter as jest.Mock).mockReturnValue({
   push: mockPush,
+});
+
+(useSearchParams as jest.Mock).mockReturnValue({
+  get: mockGet.mockImplementation((param: string) => {
+    if (param === "callbackUrl") return null; // or return a test URL if needed
+    return null;
+  }),
 });
 
 describe("LoginForm", () => {
