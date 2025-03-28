@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { saltHashPassword } from "@/lib/auth";
 import { generateAccessToken } from "@/lib/jwt";
 import { saveRefreshToken } from "@/lib/auth-db";
-import { RegisterInput } from "@/lib/validations/auth";
+import { RegistrationInput } from "@/lib/validations/auth";
 import { ConflictError } from "@/lib/errors";
 import { AUTH_CONFIG } from "@/lib/config/auth";
 
@@ -133,7 +133,7 @@ import { AUTH_CONFIG } from "@/lib/config/auth";
  *                   example: "Internal server error"
  */
 
-export default async function registerUser(input: RegisterInput) {
+export default async function registerUser(input: RegistrationInput) {
   const existingUser = await db.user.findUnique({
     where: { email: input.email },
     select: { id: true },
