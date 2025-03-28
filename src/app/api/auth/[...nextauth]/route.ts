@@ -1,5 +1,4 @@
-import NextAuth from "next-auth";
-import authOptions from "@/lib/next-auth/authOptions";
+import { GET, POST } from "@/auth";
 /**
  * @swagger
  * /api/auth/callback/credentials:
@@ -46,5 +45,4 @@ import authOptions from "@/lib/next-auth/authOptions";
  * @swagger
  * (Swagger documentation goes here)
  */
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { GET, POST };
