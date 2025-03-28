@@ -81,7 +81,6 @@ model JournalEntry {
 model Category {
   id              String  @id @default(uuid()) @db.Uuid
   name            String  @unique
-  color           String
   systemGenerated Boolean @default(false)
 
   createdAt       DateTime               @default(now())
