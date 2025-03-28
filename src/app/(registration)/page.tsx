@@ -1,10 +1,16 @@
+import { checkAuth } from "@/lib/next-auth/checkAuth";
+import { redirect } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
 import RegistrationForm from "@/components/registration/registration-form";
 
-export default function GetStartedPage() {
+export default async function GetStartedPage() {
+  const { isAuthenticated } = await checkAuth();
+  if (isAuthenticated) {
+    redirect("/my-journal");
+  }
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-white text-neutral-900 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
