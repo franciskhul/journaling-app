@@ -92,7 +92,11 @@ export async function addToJWTDenylist(token: string, userId: string) {
     data: {
       token,
       userId: userId,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Set expiration (same as access token)
+      expiresAt: new Date(Date.now() + AUTH_CONFIG.TOKEN_EXPIRATION_TIME + 30), // Will expire after the Token has expired with some buffer
     },
   });
+}
+
+export async function checkDenylist(token: string) {
+  return await db.jWT_Denylist.findFirst({ where: { token } });
 }
