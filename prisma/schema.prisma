@@ -21,7 +21,7 @@ model User {
   role         Role           @default(USER)
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  Journal      Journal[]
+  Journal      JournalEntry[]
   categories   Category[]     @relation("UserCategories")
   UserCategory UserCategory[]
   tokens       RefreshToken[]
@@ -62,7 +62,7 @@ model JWT_Denylist {
   @@index([token])
 }
 
-model Journal {
+model JournalEntry {
   id              String            @id @default(uuid()) @db.Uuid
   userId          String            @db.Uuid
   title           String
@@ -86,7 +86,7 @@ model Category {
 
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  journals        Journal[]         @relation("JournalCategories")
+  journals        JournalEntry[]    @relation("JournalCategories")
   JournalCategory JournalCategory[]
   users           User[]            @relation("UserCategories")
   UserCategory    UserCategory[]
@@ -98,8 +98,8 @@ model JournalCategory {
   journalId  String @db.Uuid
   categoryId String @db.Uuid
 
-  journal  Journal  @relation(fields: [journalId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  journal  JournalEntry @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  category Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([journalId, categoryId]) // Composite primary key
 }
