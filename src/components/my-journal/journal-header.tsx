@@ -7,10 +7,9 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Plus, Calendar as CalendarIcon, LogOut, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   Tooltip,
@@ -26,13 +25,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
-
 export function JournalHeader() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [pending, setPending] = useState(false);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const router = useRouter();
+
+  const [month, setMonth] = useState(
+    parseInt(searchParams.get("month") || new Date().getMonth().toString())
+  );
+
+  const [year, setYear] = useState(
+    parseInt(searchParams.get("year") || new Date().getFullYear().toString())
+  );
+  const [pending, setPending] = useState(false);
 
   const handleLogout = async () => {
     setPending(true);
@@ -54,6 +59,16 @@ export function JournalHeader() {
     }
     setPending(false);
   };
+
+  const handleMonthYearChange = (
+    newMonth: string | number,
+    newYear: string | number
+  ) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("month", newMonth.toString());
+    params.set("year", newYear.toString());
+    router.replace(`${pathname}?${params.toString()}`);
+  };
   return (
     <header
       className="sticky top-0 z-10 flex 
@@ -68,15 +83,18 @@ export function JournalHeader() {
             className="hover:bg-amber-100 text-amber-900 font-medium pl-3"
           >
             <CalendarIcon className="mr-2 h-4 w-4 text-amber-600" />
-            {format(new Date(year, month, 1), "MMM yyyy")}
+            {format(new Date(year, month - 1, 1), "MMM yyyy")}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0 bg-white space-y-2">
           {/* Month Selector */}
-          <div className="px-3 pt-3 flex gap-2">
+          <div className="px-3 py-3 flex gap-2">
             <Select
               value={month.toString()}
-              onValueChange={(value) => setMonth(parseInt(value))}
+              onValueChange={(newMonth) => {
+                setMonth(parseInt(newMonth));
+                handleMonthYearChange(newMonth, year);
+              }}
             >
               <SelectTrigger className="w-[120px]">
                 <SelectValue placeholder="Month" />
@@ -93,7 +111,10 @@ export function JournalHeader() {
             {/* Year Selector */}
             <Select
               value={year.toString()}
-              onValueChange={(value) => setYear(parseInt(value))}
+              onValueChange={(newYear) => {
+                setYear(parseInt(newYear));
+                handleMonthYearChange(month, newYear);
+              }}
             >
               <SelectTrigger className="w-[100px]">
                 <SelectValue placeholder="Year" />
@@ -110,19 +131,6 @@ export function JournalHeader() {
               </SelectContent>
             </Select>
           </div>
-
-          {/* Calendar - Now shows days but highlights entire month */}
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            month={new Date(year, month, 1)}
-            components={{
-              Day: () => null, // Hide day selection
-            }}
-            defaultMonth={new Date(year, month, 1)}
-            className="border-t pt-0"
-          />
         </PopoverContent>
       </Popover>
 

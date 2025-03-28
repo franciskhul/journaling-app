@@ -15,7 +15,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CalendarBadge } from "./calendar-badge";
-import { JournalEntry } from "@/app/my-journal/entries/[id]/page";
+import { JournalEntry } from "@/types/journalEntry";
+// import { JournalEntry } from "@/app/my-journal/entries/[id]/page";
 
 // Emoji mapping for emotions
 const EMOTION_EMOJIS: Record<string, string> = {
@@ -28,11 +29,11 @@ const EMOTION_EMOJIS: Record<string, string> = {
   tired: "😴",
 };
 
-interface FunEntryCardProps {
+interface JournalEntryCardProps {
   journalEntry: JournalEntry;
 }
 
-export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
+export function JournalEntryCard({ journalEntry }: JournalEntryCardProps) {
   const { id, title, contentSummary, category, createdAt, readingTime, mood } =
     journalEntry;
   // Generate content summary (first 50 chars)
@@ -40,7 +41,7 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
 
   return (
     <Card
-      className="border-2 border-yellow-100 bg-yellow-50 hover:shadow-md transition-all max-w-6xl mx-auto"
+      className="border-2 border-yellow-100 bg-yellow-50 hover:shadow-md transition-all w-full"
       key={id}
     >
       <div className="flex">
@@ -61,7 +62,8 @@ export function JournalEntryCard({ journalEntry }: FunEntryCardProps) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="text-2xl cursor-default">
-                      {EMOTION_EMOJIS[mood] || EMOTION_EMOJIS.neutral}
+                      {EMOTION_EMOJIS.excited}
+                      {/* {EMOTION_EMOJIS[mood] || EMOTION_EMOJIS.neutral} */}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
