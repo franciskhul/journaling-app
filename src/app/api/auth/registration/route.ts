@@ -1,173 +1,157 @@
-// app/api/auth/register/route.ts
-import { db } from "@/lib/db";
-import { saltHashPassword } from "@/lib/auth"; // Assuming you've renamed saltHashPassword
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import { generateAccessToken } from "@/lib/jwt";
-import { saveRefreshToken } from "@/lib/auth-db";
-import { AUTH_CONFIG } from "@/lib/config/auth"; // Centralized config
-
+import { ConflictError, ValidationError } from "@/lib/errors";
+import registerUser from "@/services/auth/registerUser";
+import { registrationSchema } from "@/lib/validations/auth";
+import { ZodError, ZodTypeAny } from "zod";
+import { AUTH_CONFIG } from "@/lib/config/auth";
 /**
  * @swagger
- * tags:
- *   - name: Authentication
- *     description: User registration and authentication
- *
- * components:
- *   schemas:
- *     RegisterRequest:
- *       type: object
- *       required:
- *         - name
- *         - email
- *         - password
- *       properties:
- *         name:
- *           type: string
- *           example: "John Doe"
- *         email:
- *           type: string
- *           format: email
- *           example: "user@example.com"
- *         password:
- *           type: string
- *           format: password
- *           minLength: 8
- *           example: "Str0ngP@ssword"
- *
- *     UserResponse:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *           format: uuid
- *         email:
- *           type: string
- *         role:
- *           type: string
- *           enum: [USER, ADMIN]
- *
- *     AuthTokens:
- *       type: object
- *       properties:
- *         accessToken:
- *           type: string
- *           description: JWT access token
- *         refreshToken:
- *           type: string
- *           description: JWT refresh token
- *         expires:
- *           type: string
- *           format: date-time
- *
- *     ErrorResponse:
- *       type: object
- *       properties:
- *         message:
- *           type: string
- *         errors:
- *           type: object
- *           additionalProperties:
- *             type: array
- *             items:
+ * /api/auth/registration:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: Register a new user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, email, password]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 50
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 maxLength: 100
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *                       enum: [USER, ADMIN]
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 expires:
+ *                   type: string
+ *                   format: date-time
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
  *               type: string
+ *             example: next-auth.session-token=abc123; Path=/; HttpOnly; SameSite=Lax; Max-Age=86400
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Validation failed
+ *                 details:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                   example:
+ *                     email: ["Invalid email format"]
+ *                     password: ["Must contain at least one uppercase letter"]
+ *       409:
+ *         description: Conflict
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Email already registered
+ *       500:
+ *         description: Internal server error
  */
-
-const registerSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z
-    .string()
-    .min(
-      AUTH_CONFIG.PASSWORD.MIN_LENGTH,
-      `Password must be at least ${AUTH_CONFIG.PASSWORD.MIN_LENGTH} characters`
-    )
-    .regex(/[A-Z]/, "Must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Must contain at least one special character"),
-});
-
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const validation = registerSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        { errors: validation.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    const { name, email, password } = validation.data;
-
-    // Check if user exists
-    const existingUser = await db.user.findUnique({
-      where: { email },
-      select: { id: true }, // Only get what we need
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { message: "Email already in use" },
-        { status: 409 }
-      );
-    }
-
-    // Create user in transaction
-    const [newUser, refreshToken] = await db.$transaction(async (tx) => {
-      const hashedPassword = await saltHashPassword(password);
-      const user = await tx.user.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          role: AUTH_CONFIG.DEFAULT_ROLE,
-        },
-        select: { id: true, email: true, role: true },
+    let body;
+    try {
+      body = await req.json();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      throw new ValidationError({
+        root: ["Invalid JSON format"],
       });
+    }
 
-      const refreshToken = await saveRefreshToken(user.id);
-      return [user, refreshToken];
-    });
+    const validation = registrationSchema.safeParse(body);
+    if (!validation.success) {
+      throw ValidationError.fromZodError(
+        validation.error as ZodError<ZodTypeAny>
+      );
+    }
 
-    // Generate tokens
-    const accessToken = generateAccessToken({
-      id: newUser.id,
-      email: newUser.email,
-      role: newUser.role,
-    });
+    const { accessToken, refreshToken, user, expires } = await registerUser(
+      validation.data
+    );
 
-    // Prepare response
     const response = NextResponse.json(
-      {
-        user: newUser, // Already properly selected
-        accessToken,
-        refreshToken,
-        expires: new Date(
-          Date.now() + AUTH_CONFIG.TOKEN_EXPIRATION_TIME * 1000
-        ).toISOString(),
-      },
+      { user, accessToken, refreshToken, expires },
       { status: 201 }
     );
 
-    // Set cookies
     response.cookies.set({
-      name: AUTH_CONFIG.COOKIE_NAMES.SESSION_TOKEN,
+      name: "next-auth.session-token",
       value: accessToken,
-      maxAge: AUTH_CONFIG.TOKEN_EXPIRATION_TIME,
-      path: "/",
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      httpOnly: true,
+      maxAge: AUTH_CONFIG.TOKEN_EXPIRATION_TIME, // 1 day
+      path: "/",
     });
 
-    return response; // Note: No refresh token cookie as per your JWT strategy
+    return response;
   } catch (error) {
     console.error("Registration error:", error);
+
+    if (error instanceof ValidationError) {
+      return NextResponse.json(
+        {
+          error: error.message,
+          details: error.errors,
+        },
+        { status: error.statusCode }
+      );
+    }
+
+    if (error instanceof ConflictError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.statusCode }
+      );
+    }
+
     return NextResponse.json(
-      { message: "Internal server error" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
