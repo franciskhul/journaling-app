@@ -6,9 +6,10 @@ export async function getServerSession() {
 
 export async function checkAuth() {
   const session = await auth();
-  console.log("*session**", session);
   return {
     isAuthenticated: !!session?.user,
     user: session?.user,
+    accessToken: session?.accessToken,
+    refreshToken: session?.refreshToken,
   };
 }
