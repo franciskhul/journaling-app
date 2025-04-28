@@ -1,5 +1,6 @@
 import { JournalEntryCard } from "@/components/my-journal/journal-entry";
 import { JournalEntry } from "./entries/[id]/page";
+import { useJournal } from "@/context/JournalContext";
 
 const entry: JournalEntry = {
   id: "1",
@@ -17,6 +18,7 @@ const entry: JournalEntry = {
   mood: "excited",
 };
 
-export default function DashboardPage() {
+export default function JournalEntries() {
+  const { month, year } = useJournal();
   return <JournalEntryCard journalEntry={entry} />;
 }

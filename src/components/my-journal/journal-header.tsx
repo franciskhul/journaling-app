@@ -26,10 +26,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { useJournal } from "@/context/JournalContext";
+
 export function JournalHeader() {
+  const { month, year, setMonth, setYear } = useJournal();
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [month, setMonth] = useState(new Date().getMonth());
-  const [year, setYear] = useState(new Date().getFullYear());
+  // const [month, setMonth] = useState(new Date().getMonth());
+  // const [year, setYear] = useState(new Date().getFullYear());
   const [pending, setPending] = useState(false);
   const router = useRouter();
 
