@@ -11,6 +11,9 @@
    6. [Initialize Prisma](#initialize-prisma)
    7. [Run the Development Server](#run-the-development-server)
 2. [View API Documentation](#view-api-documentation)
+3. [Project Documentation](#project-documentation)
+   1. [System Design](#system-design)
+   2. [Technical Decisions](#technical-decisions)
 
 ---
 
@@ -202,3 +205,16 @@ The API documentation is automatically generated using Swagger. To view the API 
 
 - Swagger UI: Visit [Swagger API UI](http://localhost:3000/api-docs) to view the API documentation in JSON format.
 - Swagger JSON: Visit [Swagger API JSON](http://localhost:3000/api-docs/json) to view the API documentation in JSON format.
+
+## Project Documentation
+
+For comprehensive project documentation, please refer to:
+
+### System Design
+
+- [Architecture Overview](docs/SYSTEM_DESIGN.md#architecture-diagram-and-explanation)
+- [Data Model Design](docs/SYSTEM_DESIGN.md#data-model-design-and-relationships)
+- [Security Implementation](docs/SYSTEM_DESIGN.md#security-measures-beyond-basic-authentication)
+- [Scaling Considerations](docs/SYSTEM_DESIGN.md#scaling-challenges-and-solutions)
+
+### Technical Decisions
